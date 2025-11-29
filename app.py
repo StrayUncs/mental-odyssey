@@ -11,6 +11,9 @@ socketio = SocketIO(app, cors_allowed_origins="*", max_http_buffer_size=10e6)
 CHAT_ROOM = 'main'
 room_data = {'messages': [], 'users': []}
 users_profiles = {}  # Store user profiles with images
+hand_raised = {}  # Track hand raised status: {username: timestamp}
+speaking_queue = []  # Queue of users who raised hands, in order
+current_speaker = None  # The user currently speaking
 users = {}
 
 @app.route("/")
@@ -45,7 +48,7 @@ def on_join(data):
         room_data['users'].append(username)
 
     # Broadcast updated user list to all clients with profile images
-    users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
     emit('users_update', {'users': users_data}, broadcast=True)
     
     # Notify everyone in the room
@@ -69,6 +72,11 @@ def on_send_message(data):
     
     if not username:
         emit('error', {'message': 'Please join first'})
+        return
+    
+    # Check if user is the first in the speaking queue
+    if not speaking_queue or speaking_queue[0] != username:
+        emit('error', {'message': 'Only the first person with raised hand can speak'})
         return
     
     timestamp = datetime.now().strftime('%H:%M:%S')
@@ -96,8 +104,14 @@ def on_leave_room():
             # Remove user from room
             room_data['users'].remove(username)
             
+            # Remove from hand_raised and speaking_queue if present
+            if username in hand_raised:
+                del hand_raised[username]
+            if username in speaking_queue:
+                speaking_queue.remove(username)
+            
             # Broadcast updated user list to all clients
-            users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+            users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
             emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
@@ -127,8 +141,14 @@ def handle_disconnect():
             # Remove user from room
             room_data['users'].remove(username)
             
+            # Remove from hand_raised and speaking_queue if present
+            if username in hand_raised:
+                del hand_raised[username]
+            if username in speaking_queue:
+                speaking_queue.remove(username)
+            
             # Broadcast updated user list to all clients
-            users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+            users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
             emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
@@ -140,6 +160,53 @@ def handle_disconnect():
             }, room=CHAT_ROOM)
         
         del users[request.sid]
+
+@socketio.on('raise_hand')
+def on_raise_hand():
+    if request.sid not in users:
+        return
+    
+    username = users[request.sid]['name']
+    if not username:
+        emit('error', {'message': 'Please join first'})
+        return
+    
+    # Add user to hand_raised and speaking_queue if not already there
+    if username not in hand_raised:
+        hand_raised[username] = datetime.now()
+        speaking_queue.append(username)
+    
+    # Broadcast updated user list with hand raised status
+    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+    emit('users_update', {'users': users_data}, broadcast=True)
+    emit('hand_raised', {'username': username}, room=CHAT_ROOM)
+    # Notify all clients about the current speaker (first in queue)
+    current_speaker_name = speaking_queue[0] if speaking_queue else None
+    emit('current_speaker_update', {'speaker': current_speaker_name}, broadcast=True)
+
+@socketio.on('lower_hand')
+def on_lower_hand():
+    if request.sid not in users:
+        return
+    
+    username = users[request.sid]['name']
+    if not username:
+        emit('error', {'message': 'Please join first'})
+        return
+    
+    # Remove user from hand_raised and speaking_queue
+    if username in hand_raised:
+        del hand_raised[username]
+    if username in speaking_queue:
+        speaking_queue.remove(username)
+    
+    # Broadcast updated user list with hand raised status
+    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+    emit('users_update', {'users': users_data}, broadcast=True)
+    emit('hand_lowered', {'username': username}, room=CHAT_ROOM)
+    # Notify all clients about the current speaker (first in queue)
+    current_speaker_name = speaking_queue[0] if speaking_queue else None
+    emit('current_speaker_update', {'speaker': current_speaker_name}, broadcast=True)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

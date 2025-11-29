@@ -1,0 +1,52 @@
+/* --- Global Reset & Page Setup --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    
+    /* Flexbox Setup */
+    display: flex;
+    flex-direction: row; /* Arranges items side-by-side */
+    
+    /* CHANGED: 'stretch' forces panels to take full height */
+    align-items: stretch; 
+    
+    justify-content: center; 
+    min-height: 100vh;
+}
+
+/* --- Panel Left --- */
+.panel-left {
+    /* Fixed width for sidebar */
+    width: 250px; 
+    
+    /* Visuals */
+    background-color: #e4e6eb;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+}
+
+/* --- Panel Middle --- */
+.panel-middle {
+    /* 'flex: 1' makes this panel grow to fill all remaining space */
+    flex: 1; 
+    
+    /* Visuals */
+    background-color: #ffffff;
+    padding: 20px;
+    
+    /* Optional constraint to stop it from getting too wide on huge screens */
+    max-width: 1200px; 
+}
+
+/* --- Panel Right --- */
+.panel-right {
+    /* Fixed width for sidebar */
+    width: 250px; 
+    
+    /* Visuals */
+    background-color: #e4e6eb;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+}

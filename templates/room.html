@@ -37,7 +37,7 @@
       /* Left Panel - Profile & Controls */
       .left-panel {
         width: 250px;
-        background: #f8f9fa;
+        background: #d66cc4;
         border-right: 2px solid #e0e0e0;
         display: flex;
         flex-direction: column;
@@ -111,7 +111,47 @@
         gap: 12px;
       }
 
-      /* Raise-hand UI removed (feature reverted) */
+      /* Raise/lower hand buttons */
+      #raise-hand-btn, #lower-hand-btn {
+        display: none;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        align-self: stretch;
+        text-align: center;
+      }
+
+      /* Primary raise hand (gold/yellow) */
+      #raise-hand-btn {
+        background: linear-gradient(90deg, #FFD54F 0%, #FFC107 100%);
+        color: #222;
+      }
+      #raise-hand-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(255,193,7,0.18); }
+      #raise-hand-btn:active { transform: translateY(-1px) scale(0.99); }
+
+      /* Lower hand / cancel (muted) */
+      #lower-hand-btn {
+        background: #6b7280;
+        color: #fff;
+      }
+      #lower-hand-btn:hover { background: #555; transform: translateY(-2px); }
+      #lower-hand-btn:active { transform: translateY(0); }
+
+      /* Accessible focus outlines */
+      #raise-hand-btn:focus, #lower-hand-btn:focus {
+        outline: 3px solid rgba(255, 193, 7, 0.35);
+        outline-offset: 2px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 1024px) {
+        #raise-hand-btn, #lower-hand-btn { padding: 8px 10px; font-size: 13px; border-radius: 8px; }
+      }
 
       .controls-section input {
         padding: 12px;
@@ -236,7 +276,12 @@
         overflow: hidden;
       }
 
-      /* hand-raised styles removed (feature reverted) */
+      /* Hand raised styling - yellow outline */
+      .member-avatar.hand-raised {
+        border: 4px solid #FFD700 !important;
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.15);
+      }
+
       .member-avatar img {
         width: 100%;
         height: 100%;
@@ -326,7 +371,7 @@
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: #667eea;
+        background: #3a57d7;
         color: white;
         display: flex;
         align-items: center;
@@ -487,6 +532,8 @@
             autocomplete="off"
           />
           <button id="connect-btn">Connect</button>
+          <button id="raise-hand-btn" style="display: none; background: #FFD700; color: #333;">Raise Hand</button>
+          <button id="lower-hand-btn" style="display: none; background: #999; color: white;">Lower Hand</button>
           <button id="leave-btn">Leave</button>
         </div>
       </div>
@@ -531,6 +578,8 @@
       const socket = io();
       let isConnected = false;
       let currentUsername = '';
+      let handRaised = false;
+      let currentSpeaker = null;
 
       // DOM Elements
       const usernameInput = document.getElementById('username');
@@ -545,8 +594,10 @@
       const profileName = document.getElementById('profile-name');
       const profileStatus = document.getElementById('profile-status');
       const profilePicInput = document.getElementById('profile-pic-input');
-        const profileImgDisplay = document.querySelector('.profile-img-display');
-        let userProfileImage = null;
+      const profileImgDisplay = document.querySelector('.profile-img-display');
+      const raiseHandBtn = document.getElementById('raise-hand-btn');
+      const lowerHandBtn = document.getElementById('lower-hand-btn');
+      let userProfileImage = null;
       // Socket Events
       socket.on('connection_response', (data) => {
         console.log('Connected:', data.data);
@@ -587,6 +638,28 @@
         addSystemMessage('You have left the room');
       });
 
+      socket.on('hand_raised', (data) => {
+        addSystemMessage(`${data.username} raised their hand`);
+      });
+
+      socket.on('hand_lowered', (data) => {
+        addSystemMessage(`${data.username} lowered their hand`);
+      });
+
+      socket.on('current_speaker_update', (data) => {
+        currentSpeaker = data.speaker;
+        // Update input/send button state based on whether current user is the speaker
+        if (isConnected && handRaised) {
+          if (currentUsername === currentSpeaker) {
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+          } else {
+            messageInput.disabled = true;
+            sendBtn.disabled = true;
+          }
+        }
+      });
+
       // UI Event Handlers
       connectBtn.addEventListener('click', () => {
         const username = usernameInput.value.trim();
@@ -606,13 +679,14 @@
         usernameInput.disabled = true;
         connectBtn.style.display = 'none';
         leaveBtn.style.display = 'block';
-        messageInput.disabled = false;
-        sendBtn.disabled = false;
+        raiseHandBtn.style.display = 'block';
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
         inputArea.style.display = 'flex';
         profileName.textContent = username;
         profileStatus.textContent = 'Online';
-          profileName.style.display = 'block';
-          profileStatus.style.display = 'block';
+        profileName.style.display = 'block';
+        profileStatus.style.display = 'block';
         messageInput.focus();
       });
 
@@ -625,6 +699,24 @@
       leaveBtn.addEventListener('click', () => {
         socket.emit('leave_room');
       });
+      
+      raiseHandBtn.addEventListener('click', () => {
+        socket.emit('raise_hand');
+        handRaised = true;
+        raiseHandBtn.style.display = 'none';
+        lowerHandBtn.style.display = 'block';
+        // Don't enable input here - wait for current_speaker_update to confirm if this user is first
+      });
+
+      lowerHandBtn.addEventListener('click', () => {
+        socket.emit('lower_hand');
+        handRaised = false;
+        raiseHandBtn.style.display = 'block';
+        lowerHandBtn.style.display = 'none';
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+      });
+      
       profilePicInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -676,7 +768,7 @@
 
       function sendMessage() {
         const message = messageInput.value.trim();
-        if (message && isConnected) {
+        if (message && isConnected && handRaised && currentUsername === currentSpeaker) {
           socket.emit('send_message', { message });
           messageInput.value = '';
           messageInput.focus();
@@ -743,8 +835,9 @@
 
             const user = typeof userObj === 'string' ? userObj : userObj.name;
             const profileImage = typeof userObj === 'string' ? null : userObj.image;
+            const handRaisedStatus = typeof userObj === 'string' ? false : userObj.hand_raised;
 
-            console.log(`User ${user}: has profile image = ${profileImage ? 'Yes' : 'No'}`);
+            console.log(`User ${user}: has profile image = ${profileImage ? 'Yes' : 'No'}, hand raised = ${handRaisedStatus}`);
             
             const initial = user.charAt(0).toUpperCase();
             const colors = [
@@ -761,9 +854,11 @@
               ? `<img src="${profileImage}" style="width: 100%; height: 100%; object-fit: cover;">`
               : initial;
 
+            const handRaisedClass = handRaisedStatus ? 'hand-raised' : '';
+
             return `
               <div class="member-card" style="transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px)); left: 50%; top: 50%;">
-                <div class="member-avatar" style="background: ${profileImage ? 'transparent' : bgColor};">${avatarContent}</div>
+                <div class="member-avatar ${handRaisedClass}" style="background: ${profileImage ? 'transparent' : bgColor};">${avatarContent}</div>
                 <div class="member-name">${escapeHtml(user)}</div>
               </div>
             `;
@@ -795,11 +890,14 @@
       function resetUI() {
         isConnected = false;
         currentUsername = '';
+        handRaised = false;
 
         usernameInput.disabled = false;
         usernameInput.value = '';
         connectBtn.style.display = 'block';
         leaveBtn.style.display = 'none';
+        raiseHandBtn.style.display = 'none';
+        lowerHandBtn.style.display = 'none';
         messageInput.disabled = true;
         messageInput.value = '';
         sendBtn.disabled = true;
