@@ -12,6 +12,20 @@ if not os.environ.get("OPENAI_API_KEY"):
 
 model = init_chat_model("gpt-5")
 
+# greeting agent 
+GREETING_AGENT_PROMPT = (
+    "You are a greeting agent"
+    "Please parse the natural language greeting from the user into name and sentence"
+    "Now output back a nice greeting to the user"
+    "Please only respond with a single line advice message."
+    )
+
+greeting_agent = create_agent(
+    model,
+    tools=[greeting_tool],
+    system_prompt=GREETING_AGENT_PROMPT,
+)
+
 # anxiety agent definition
 ANXIETY_AGENT_PROMPT = (
     "You are a greeting agent"
