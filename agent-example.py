@@ -23,6 +23,7 @@ def __init__():
     "You are a greeting agent"
     "Please parse the natural language greeting from the user into name and sentence"
     "Now output back a nice greeting to the user"
+    "Please only respond with a single line greeting message."
     )
 
     basic_agent = create_agent(
@@ -45,6 +46,7 @@ def __init__():
     "You are a greeting agent"
     "Please parse the natural language greeting from the user into name and sentence"
     "Now output back a nice greeting to the user"
+    "Please only respond with a single line advice message."
     )
     
     advice_agent = create_agent(
@@ -67,13 +69,9 @@ def __init__():
     SUPERVISOR_PROMPT = (
         "You are a helpful personal assistant. "
         "You MUST decide whether to call one of these tools: schedule_basic(request) or schedule_advice(request). "
-        "Use schedule_basic when the user asks to create, modify, or check calendar events, availability, or meeting times. "
-        "Use schedule_advice when the user asks to send notifications, reminders, or any email-like communication. "
-        "When you decide to call a tool, OUTPUT EXACTLY one line beginning with: CALL_TOOL: <tool_name>(<natural language request>) "
-        "For example, If the user says they did not self harm, respond: "
-        "CALL_TOOL: schedule_basic('good job not harming yourself') "
-        "If the user says they did self harm respond: "
-        "CALL_TOOL: schedule_advice('take care and seek help if needed') "
+        "Use schedule_basic when the user did not self harm "
+        "Use schedule_advice when the user did self harm "
+        "When you decide to call a tool, OUTPUT EXACTLY one line beginning with: CALL_TOOL: <tool_name>(<tool_result>) "
         "After the tool runs and returns its result, include the tool result verbatim and then continue with any follow-up message to the user. "
         "Do not invent or guess tool outputs — always call the appropriate tool and relay its returned text. "
         "If no tool is needed, answer directly as the assistant without calling any tools."
@@ -85,14 +83,36 @@ def __init__():
         system_prompt=SUPERVISOR_PROMPT,
     )
 
-    query = "Hello, my name is Bob, I did not self harm today."
+    query = "Hello, my name is Bob, I did self harm today."
 
-    for step in supervisor_agent.stream(
-        {"messages": [{"role": "user", "content": query}]}
-    ):
+    # for step in supervisor_agent.stream(
+    #     {"messages": [{"role": "user", "content": query}]}
+    # ):
+    #     for update in step.values():
+    #         for message in update.get("messages", []):
+    #             message.pretty_print()
+    
+    tool_output = None
+    for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
+        # inspect every update for common tool-result shapes
         for update in step.values():
-            for message in update.get("messages", []):
-                message.pretty_print()
+            if isinstance(update, dict):
+                # common keys
+                for key in ("tool_result", "tool_response", "tool_output", "result"):
+                    if key in update and update[key]:
+                        tool_output = update[key]
+                # messages array
+                for m in update.get("messages", []):
+                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+            else:
+                # object-like updates (some LangChain versions)
+                if hasattr(update, "tool_result") and getattr(update, "tool_result"):
+                    tool_output = getattr(update, "tool_result")
+                for m in getattr(update, "messages", []) or []:
+                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+        if tool_output:
+            print(tool_output)
+            break
             
 
 @tool
@@ -116,20 +136,14 @@ def advice_tool(
 ## sub-agents as tools
 @tool
 def schedule_basic(request: str) -> str:
-    """Schedule calendar events using natural language.
-
-    Use this when the user wants to create, modify, or check calendar appointments.
-    Handles date/time parsing, availability checking, and event creation.
-
-    Input: Natural language scheduling request (e.g., 'meeting with design team
-    next Tuesday at 2pm')
+    """Schedules basic greeting messages.
     """
     global basic_agent
     if basic_agent is None:
         raise RuntimeError("basic_agent not initialized")
     print("schedule_basic CALLED with:", request)
     result = basic_agent.invoke({"messages": [{"role": "user", "content": request}]})
-    print("BASIC TOOL RAW RESULT:", result)
+    # print("BASIC TOOL RAW RESULT:", result)
     # normalize common return shapes to a string
     if isinstance(result, dict):
         msgs = result.get("messages", []) or []
@@ -141,14 +155,7 @@ def schedule_basic(request: str) -> str:
 
 @tool
 def schedule_advice(request: str) -> str:
-    """Send emails using natural language.
-
-    Use this when the user wants to send notifications, reminders, or any email
-    communication. Handles recipient extraction, subject generation, and email
-    composition.
-
-    Input: Natural language email request (e.g., 'send them a reminder about
-    the meeting')
+    """Schedules advice messages.
     """
 
     global advice_agent
@@ -156,7 +163,7 @@ def schedule_advice(request: str) -> str:
         raise RuntimeError("advice_agent not initialized")
     print("schedule_advice CALLED with:", request)
     result = advice_agent.invoke({"messages": [{"role": "user", "content": request}]})
-    print("ADVICE TOOL RAW RESULT:", result)
+    # print("ADVICE TOOL RAW RESULT:", result)
     if isinstance(result, dict):
         msgs = result.get("messages", []) or []
         if msgs:
