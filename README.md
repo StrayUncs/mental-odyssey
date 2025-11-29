@@ -8,8 +8,15 @@ their mental health journey.
 ## How to use
 First put in your .env file your OPENAI_API_KEY inside
 `python -m venv venv`
-`source venv/bin/activate  `
+
+`source venv/bin/activate`
+
 `pip install -U langchain`
+
 `pip install -U langchain-openai`
+
 `pip install -U langgraph-supervisor`
+
 `pip install -U langgraph`
+
+`pip install -U flask_socketio`
