@@ -11,3 +11,5 @@ First put in your .env file your OPENAI_API_KEY inside
 `source venv/bin/activate  `
 `pip install -U langchain`
 `pip install -U langchain-openai`
+`pip install -U langgraph-supervisor`
+`pip install -U langgraph`
