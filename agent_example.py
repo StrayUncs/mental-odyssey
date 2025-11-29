@@ -1,5 +1,4 @@
 import os
-import sys
 import getpass
 from xml.parsers.expat import model
 from langchain.chat_models import init_chat_model
@@ -9,12 +8,10 @@ from langchain.agents import create_agent
 
 basic_agent = None
 advice_agent = None
-
-query = sys.argv[1] if len(sys.argv) > 1 else "test"
-print("You passed:", query)
+supervisor_agent = None
 
 def __init__():
-    global basic_agent, advice_agent
+    global basic_agent, advice_agent, supervisor_agent
     load_dotenv()
 
     if not os.environ.get("OPENAI_API_KEY"):
@@ -94,27 +91,27 @@ def __init__():
     #         for message in update.get("messages", []):
     #             message.pretty_print()
     
-    tool_output = None
-    for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
-        # inspect every update for common tool-result shapes
-        for update in step.values():
-            if isinstance(update, dict):
-                # common keys
-                for key in ("tool_result", "tool_response", "tool_output", "result"):
-                    if key in update and update[key]:
-                        tool_output = update[key]
-                # messages array
-                for m in update.get("messages", []):
-                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
-            else:
-                # object-like updates (some LangChain versions)
-                if hasattr(update, "tool_result") and getattr(update, "tool_result"):
-                    tool_output = getattr(update, "tool_result")
-                for m in getattr(update, "messages", []) or []:
-                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
-        if tool_output:
-            print(tool_output)
-            break
+    # tool_output = None
+    # for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
+    #     # inspect every update for common tool-result shapes
+    #     for update in step.values():
+    #         if isinstance(update, dict):
+    #             # common keys
+    #             for key in ("tool_result", "tool_response", "tool_output", "result"):
+    #                 if key in update and update[key]:
+    #                     tool_output = update[key]
+    #             # messages array
+    #             for m in update.get("messages", []):
+    #                 tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+    #         else:
+    #             # object-like updates (some LangChain versions)
+    #             if hasattr(update, "tool_result") and getattr(update, "tool_result"):
+    #                 tool_output = getattr(update, "tool_result")
+    #             for m in getattr(update, "messages", []) or []:
+    #                 tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+    #     if tool_output:
+    #         print(tool_output)
+    #         break
             
 
 @tool
@@ -172,5 +169,28 @@ def schedule_advice(request: str) -> str:
             last = msgs[-1]
             return getattr(last, "text", None) or getattr(last, "content", None) or str(last)
     return str(result)
+
+# function to run queries from other files
+def run_query(query: str) -> str:
+    global supervisor_agent
+    if supervisor_agent is None:
+        __init__()  # lazy init if not already done
+    tool_output = None
+    for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
+        for update in step.values():
+            if isinstance(update, dict):
+                for key in ("tool_result", "tool_response", "tool_output", "result"):
+                    if key in update and update[key]:
+                        tool_output = update[key]
+                for m in update.get("messages", []):
+                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+            else:
+                if hasattr(update, "tool_result") and getattr(update, "tool_result"):
+                    tool_output = getattr(update, "tool_result")
+                for m in getattr(update, "messages", []) or []:
+                    tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+        if tool_output:
+            return tool_output
+    return ""
 
 __init__()
