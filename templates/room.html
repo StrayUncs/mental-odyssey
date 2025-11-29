@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Discussion Room - Chat</title>
+    <title>Mental Odyssey - Chat</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
@@ -23,91 +23,136 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-
-      .container {
-        display: flex;
-        width: 100%;
-        max-width: 1200px;
-        height: 600px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        align-items: stretch;
         overflow: hidden;
       }
 
-      .sidebar {
-        width: 300px;
-        background: #f8f9fa;
-        border-right: 1px solid #e0e0e0;
+      .app-container {
         display: flex;
-        flex-direction: column;
-        padding: 20px;
+        width: 100%;
+        height: 100vh;
+        gap: 0;
       }
 
-      .sidebar-header {
+      /* Left Panel - Profile & Controls */
+      .left-panel {
+        width: 250px;
+        background: #f8f9fa;
+        border-right: 2px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        padding: 30px 20px;
+        align-items: center;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .profile-section {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
       }
 
       .profile-img {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        background: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         margin: 0 auto 15px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 40px;
+        font-size: 45px;
         object-fit: cover;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
       }
 
-      .sidebar-header h3 {
+      .profile-img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      }
+
+      .profile-img input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .profile-img-display {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .profile-name {
+        font-size: 18px;
+        font-weight: 600;
         color: #333;
-        margin-bottom: 10px;
-        font-size: 16px;
+        margin-bottom: 5px;
       }
 
-      .connection-form {
+      .profile-status {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .controls-section {
+        width: 100%;
         display: flex;
         flex-direction: column;
         gap: 12px;
-        margin-bottom: 20px;
       }
 
-      .connection-form input {
-        padding: 10px 12px;
+      /* Raise-hand UI removed (feature reverted) */
+
+      .controls-section input {
+        padding: 12px;
         border: 1px solid #ddd;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 14px;
         font-family: inherit;
+        width: 100%;
       }
 
-      .connection-form input:focus {
+      .controls-section input:focus {
         outline: none;
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       }
 
-      #connect-btn {
-        padding: 10px;
-        background: #667eea;
-        color: white;
+      .controls-section input:disabled {
+        background: #f0f0f0;
+        cursor: not-allowed;
+      }
+
+      #connect-btn,
+      #leave-btn {
+        padding: 12px;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 600;
-        transition: background 0.3s;
+        transition: all 0.3s;
+        width: 100%;
+      }
+
+      #connect-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
       }
 
       #connect-btn:hover {
-        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
       #connect-btn:disabled {
@@ -115,79 +160,139 @@
         cursor: not-allowed;
       }
 
-      .room-indicator {
-        padding: 12px;
-        background: #e8f4f8;
-        border-radius: 6px;
-        text-align: center;
-        margin-bottom: 15px;
+      #leave-btn {
+        background: #dc3545;
+        color: white;
         display: none;
       }
 
-      .room-indicator.active {
-        display: block;
+      #leave-btn:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
       }
 
-      .room-indicator p {
-        color: #333;
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .room-indicator .room-name {
-        color: #667eea;
-        font-weight: 700;
-      }
-
-      .users-section h4 {
-        font-size: 12px;
-        color: #999;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-      }
-
-      .users-list {
+      /* Middle Panel - Members */
+      .middle-panel {
         flex: 1;
-        overflow-y: auto;
-      }
-
-      .user-item {
-        padding: 10px;
         background: white;
-        border-radius: 6px;
-        margin-bottom: 8px;
-        font-size: 14px;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .user-item::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        background: #4caf50;
-        border-radius: 50%;
-      }
-
-      .main-content {
-        flex: 1;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .members-header {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .members-circle-container {
+        position: relative;
+        width: 700px;
+        height: 700px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 40px;
+      }
+
+      .members-circle {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .member-card {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease;
+      }
+
+      .member-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 4px solid #667eea;
+        object-fit: cover;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        font-weight: 600;
+        overflow: hidden;
+      }
+
+      /* hand-raised styles removed (feature reverted) */
+      .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .member-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .center-user {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: transparent;
+        z-index: 10;
+        display: none;
+      }
+
+      .empty-members {
+        color: #999;
+        text-align: left;
+        font-size: 16px;
+        position: absolute;
+        top: 60px;
+        left: 40px;
+      }
+
+      /* Right Panel - Chat */
+      .right-panel {
+        width: 350px;
+        background: #ffffff;
+        border-left: 2px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
       }
 
       .chat-header {
         padding: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        border-bottom: 2px solid #e0e0e0;
       }
 
-      .chat-header h1 {
-        font-size: 22px;
+      .chat-header h2 {
+        font-size: 18px;
+        margin: 0;
       }
 
       .chat-messages {
@@ -197,24 +302,12 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
-        background: #fff;
       }
 
       .message {
         display: flex;
         gap: 10px;
         animation: slideIn 0.3s ease;
-      }
-
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
       }
 
       .message.system {
@@ -226,19 +319,19 @@
         color: #666;
         padding: 8px 12px;
         border-radius: 6px;
-        font-size: 13px;
+        font-size: 12px;
       }
 
       .message-avatar {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: #667eea;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         flex-shrink: 0;
       }
@@ -256,23 +349,22 @@
       .message-username {
         font-weight: 600;
         color: #333;
-        font-size: 14px;
+        font-size: 13px;
       }
 
       .message-time {
         color: #999;
-        font-size: 12px;
+        font-size: 11px;
       }
 
       .message-text {
         background: #f1f1f1;
-        padding: 10px 14px;
-        border-radius: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
         color: #333;
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.4;
         word-wrap: break-word;
-        max-width: 70%;
       }
 
       .empty-state {
@@ -281,25 +373,26 @@
         justify-content: center;
         height: 100%;
         color: #999;
-        font-size: 16px;
+        font-size: 13px;
         text-align: center;
       }
 
       .message-input-area {
-        padding: 16px 20px;
+        padding: 12px;
         background: #f8f9fa;
         border-top: 1px solid #e0e0e0;
         display: flex;
-        gap: 12px;
+        gap: 8px;
+        flex-direction: column;
       }
 
       .message-input-area input {
-        flex: 1;
-        padding: 12px 16px;
+        padding: 10px 12px;
         border: 1px solid #ddd;
         border-radius: 6px;
-        font-size: 14px;
+        font-size: 13px;
         font-family: inherit;
+        width: 100%;
       }
 
       .message-input-area input:focus {
@@ -313,7 +406,7 @@
       }
 
       #send-btn {
-        padding: 12px 24px;
+        padding: 10px;
         background: #667eea;
         color: white;
         border: none;
@@ -321,7 +414,7 @@
         cursor: pointer;
         font-weight: 600;
         transition: background 0.3s;
-        min-width: 80px;
+        font-size: 13px;
       }
 
       #send-btn:hover {
@@ -333,62 +426,60 @@
         cursor: not-allowed;
       }
 
-      #leave-btn {
-        padding: 10px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: background 0.3s;
-      }
-
-      #leave-btn:hover {
-        background: #c82333;
-      }
-
-      @media (max-width: 768px) {
-        .container {
+      @media (max-width: 1024px) {
+        .app-container {
           flex-direction: column;
-          height: auto;
-          max-height: 100vh;
         }
 
-        .sidebar {
+        .left-panel {
           width: 100%;
-          height: auto;
           border-right: none;
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 2px solid #e0e0e0;
+          padding: 20px;
+          flex-direction: row;
+          align-items: center;
+          gap: 20px;
         }
 
-        .chat-messages {
-          max-height: 300px;
+        .profile-section {
+          margin-bottom: 0;
         }
 
-        .message-text {
-          max-width: 100%;
+        .controls-section {
+          flex-direction: row;
+          flex: 1;
+          gap: 8px;
+        }
+
+        .middle-panel {
+          display: none;
+        }
+
+        .right-panel {
+          width: 100%;
+          border-left: none;
+          border-top: 2px solid #e0e0e0;
+          height: 50vh;
         }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <div class="profile-img">
-            <i class="fas fa-user"></i>
+    <div class="app-container">
+      <!-- Left Panel -->
+      <div class="left-panel">
+        <div class="profile-section">
+          <div class="profile-img" id="profile-img-container">
+            <input type="file" id="profile-pic-input" accept="image/*" />
+            <div class="profile-img-display">
+              <i class="fas fa-camera"></i>
+            </div>
           </div>
-          <h3>Join Chat Room</h3>
+          <div class="profile-name" id="profile-name" style="display: none;"></div>
+          <div class="profile-status" id="profile-status" style="display: none;"></div>
         </div>
 
-        <div class="room-indicator" id="room-indicator">
-          <p>Connected to Main Room</p>
-        </div>
-
-        <div class="connection-form">
+        <div class="controls-section">
           <input
             type="text"
             id="username"
@@ -396,28 +487,29 @@
             autocomplete="off"
           />
           <button id="connect-btn">Connect</button>
-          <button id="leave-btn" style="display: none; background: #dc3545;">Leave Room</button>
+          <button id="leave-btn">Leave</button>
         </div>
+      </div>
 
-        <div class="users-section">
-          <h4>Active Users</h4>
-          <div class="users-list" id="users-list">
-            <p style="color: #999; font-size: 13px; text-align: center; padding: 20px 0;">
-              Join a room to see users
-            </p>
+          <!-- Middle Panel -->
+      <div class="middle-panel">
+        <div class="members-header">Room Members</div>
+        <div class="members-circle-container">
+          <div class="members-circle" id="members-circle">
+            <div class="center-user" id="center-user"></div>
           </div>
         </div>
       </div>
 
-      <!-- Main Chat Area -->
-      <div class="main-content">
+      <!-- Right Panel -->
+      <div class="right-panel">
         <div class="chat-header">
-          <h1>Chat Room</h1>
+          <h2>Group Chat</h2>
         </div>
 
         <div class="chat-messages" id="messages">
           <div class="empty-state">
-            <p>Connect to a room to start chatting</p>
+            <p>Connect to start chatting</p>
           </div>
         </div>
 
@@ -425,7 +517,7 @@
           <input
             type="text"
             id="message-input"
-            placeholder="Type your message and press Enter or click Send"
+            placeholder="Type message..."
             autocomplete="off"
             disabled
           />
@@ -447,27 +539,31 @@
       const messagesDiv = document.getElementById('messages');
       const messageInput = document.getElementById('message-input');
       const sendBtn = document.getElementById('send-btn');
-      const usersList = document.getElementById('users-list');
       const inputArea = document.getElementById('input-area');
-      const roomIndicator = document.getElementById('room-indicator');
-
+      const membersCircle = document.getElementById('members-circle');
+      const centerUser = document.getElementById('center-user');
+      const profileName = document.getElementById('profile-name');
+      const profileStatus = document.getElementById('profile-status');
+      const profilePicInput = document.getElementById('profile-pic-input');
+        const profileImgDisplay = document.querySelector('.profile-img-display');
+        let userProfileImage = null;
       // Socket Events
       socket.on('connection_response', (data) => {
         console.log('Connected:', data.data);
       });
 
       socket.on('users_update', (data) => {
-        updateUsersList(data.users);
+        updateMembersList(data.users);
       });
 
       socket.on('user_joined', (data) => {
         addSystemMessage(data.message);
-        updateUsersList(data.users);
+        updateMembersList(data.users);
       });
 
       socket.on('user_left', (data) => {
         addSystemMessage(data.message);
-        updateUsersList(data.users);
+        updateMembersList(data.users);
       });
 
       socket.on('load_chat_history', (data) => {
@@ -475,7 +571,7 @@
         data.messages.forEach((msg) => {
           addMessage(msg.username, msg.message, msg.timestamp);
         });
-        updateUsersList(data.users);
+        updateMembersList(data.users);
       });
 
       socket.on('new_message', (data) => {
@@ -503,7 +599,8 @@
         currentUsername = username;
         isConnected = true;
 
-        socket.emit('join_room', { username });
+        console.log('Joining with profile image:', userProfileImage ? 'Yes' : 'No');
+        socket.emit('join_room', { username, profile_image: userProfileImage });
 
         // Update UI
         usernameInput.disabled = true;
@@ -512,14 +609,62 @@
         messageInput.disabled = false;
         sendBtn.disabled = false;
         inputArea.style.display = 'flex';
-        roomIndicator.classList.add('active');
-
-        messagesDiv.innerHTML = '';
+        profileName.textContent = username;
+        profileStatus.textContent = 'Online';
+          profileName.style.display = 'block';
+          profileStatus.style.display = 'block';
         messageInput.focus();
+      });
+
+      usernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          connectBtn.click();
+        }
       });
 
       leaveBtn.addEventListener('click', () => {
         socket.emit('leave_room');
+      });
+      profilePicInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            // Compress image before storing
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const maxWidth = 200;
+              const maxHeight = 200;
+              let width = img.width;
+              let height = img.height;
+
+              if (width > height) {
+                if (width > maxWidth) {
+                  height *= maxWidth / width;
+                  width = maxWidth;
+                }
+              } else {
+                if (height > maxHeight) {
+                  width *= maxHeight / height;
+                  height = maxHeight;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              // Compress to JPEG with lower quality
+              userProfileImage = canvas.toDataURL('image/jpeg', 0.6);
+              console.log('Profile image compressed, size:', userProfileImage.length);
+              profileImgDisplay.innerHTML = `<img src="${userProfileImage}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            };
+            img.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
       });
 
       sendBtn.addEventListener('click', sendMessage);
@@ -579,16 +724,61 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      function updateUsersList(users) {
+      function updateMembersList(users) {
         if (users.length === 0) {
-          usersList.innerHTML =
-            '<p style="color: #999; font-size: 13px; text-align: center; padding: 20px 0;">No users in room</p>';
+          membersCircle.innerHTML = '<div class="empty-members">Join to see members</div>';
+          centerUser.style.display = 'none';
           return;
         }
 
-        usersList.innerHTML = users
-          .map((user) => `<div class="user-item">${escapeHtml(user)}</div>`)
+        // Create member cards HTML
+        const radius = 270; // Distance from center
+        const angleSlice = (2 * Math.PI) / users.length;
+
+        const memberCards = users
+          .map((userObj, index) => {
+            const angle = index * angleSlice;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            const user = typeof userObj === 'string' ? userObj : userObj.name;
+            const profileImage = typeof userObj === 'string' ? null : userObj.image;
+
+            console.log(`User ${user}: has profile image = ${profileImage ? 'Yes' : 'No'}`);
+            
+            const initial = user.charAt(0).toUpperCase();
+            const colors = [
+              '#667eea',
+              '#764ba2',
+              '#f093fb',
+              '#4facfe',
+              '#00f2fe',
+            ];
+            const colorIndex = user.charCodeAt(0) % colors.length;
+            const bgColor = colors[colorIndex];
+
+            const avatarContent = profileImage 
+              ? `<img src="${profileImage}" style="width: 100%; height: 100%; object-fit: cover;">`
+              : initial;
+
+            return `
+              <div class="member-card" style="transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px)); left: 50%; top: 50%;">
+                <div class="member-avatar" style="background: ${profileImage ? 'transparent' : bgColor};">${avatarContent}</div>
+                <div class="member-name">${escapeHtml(user)}</div>
+              </div>
+            `;
+          })
           .join('');
+
+        // Update only the member cards, preserve center user
+        const existingCards = membersCircle.querySelectorAll('.member-card');
+        existingCards.forEach(card => card.remove());
+        
+        // Insert new member cards
+        membersCircle.insertAdjacentHTML('beforeend', memberCards);
+        
+        // Show center user placeholder
+        centerUser.style.display = 'flex';
       }
 
       function escapeHtml(text) {
@@ -614,9 +804,12 @@
         messageInput.value = '';
         sendBtn.disabled = true;
         inputArea.style.display = 'none';
-        roomIndicator.classList.remove('active');
-        messagesDiv.innerHTML = '<div class="empty-state"><p>Connect to the room to start chatting</p></div>';
+        profileName.style.display = 'none';
+        profileStatus.style.display = 'none';
+        messagesDiv.innerHTML = '<div class="empty-state"><p>Connect to start chatting</p></div>';
       }
     </script>
   </body>
 </html>
+
+

@@ -1,15 +1,16 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import datetime
 import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", max_http_buffer_size=10e6)
 
 # Single room data
 CHAT_ROOM = 'main'
 room_data = {'messages': [], 'users': []}
+users_profiles = {}  # Store user profiles with images
 users = {}
 
 @app.route("/")
@@ -22,14 +23,19 @@ def handle_connect():
     users[request.sid] = {'name': None, 'session_id': session_id}
     emit('connection_response', {'data': 'Connected to server'})
     # Broadcast updated user list to all clients
-    emit('users_update', {'users': room_data['users']}, broadcast=True)
+    users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+    emit('users_update', {'users': users_data}, broadcast=True)
 
 @socketio.on('join_room')
 def on_join(data):
     username = data['username']
+    profile_image = data.get('profile_image', None)  # Get profile image if provided
+    
+    print(f"User {username} joining, profile image: {profile_image is not None}")
     
     # Store user info
     users[request.sid]['name'] = username
+    users_profiles[username] = profile_image  # Store user's profile image
     
     # Join the room
     join_room(CHAT_ROOM)
@@ -37,22 +43,23 @@ def on_join(data):
     # Add user to room's user list
     if username not in room_data['users']:
         room_data['users'].append(username)
-    
-    # Broadcast updated user list to all clients
-    emit('users_update', {'users': room_data['users']}, broadcast=True)
+
+    # Broadcast updated user list to all clients with profile images
+    users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+    emit('users_update', {'users': users_data}, broadcast=True)
     
     # Notify everyone in the room
     emit('user_joined', {
         'username': username,
         'message': f'{username} has joined the room',
         'timestamp': datetime.now().strftime('%H:%M:%S'),
-        'users': room_data['users']
+        'users': users_data
     }, room=CHAT_ROOM)
     
     # Send chat history to the new user
     emit('load_chat_history', {
         'messages': room_data['messages'],
-        'users': room_data['users']
+        'users': users_data
     })
 
 @socketio.on('send_message')
@@ -78,6 +85,7 @@ def on_send_message(data):
     # Broadcast to all users
     emit('new_message', message_data, room=CHAT_ROOM)
 
+
 @socketio.on('leave_room')
 def on_leave_room():
     if request.sid in users:
@@ -89,14 +97,15 @@ def on_leave_room():
             room_data['users'].remove(username)
             
             # Broadcast updated user list to all clients
-            emit('users_update', {'users': room_data['users']}, broadcast=True)
+            users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+            emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
             emit('user_left', {
                 'username': username,
                 'message': f'{username} has left the room',
                 'timestamp': datetime.now().strftime('%H:%M:%S'),
-                'users': room_data['users']
+                'users': users_data
             }, room=CHAT_ROOM)
             
             # Leave the socket room
@@ -119,14 +128,15 @@ def handle_disconnect():
             room_data['users'].remove(username)
             
             # Broadcast updated user list to all clients
-            emit('users_update', {'users': room_data['users']}, broadcast=True)
+            users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+            emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
             emit('user_left', {
                 'username': username,
                 'message': f'{username} has left the room',
                 'timestamp': datetime.now().strftime('%H:%M:%S'),
-                'users': room_data['users']
+                'users': users_data
             }, room=CHAT_ROOM)
         
         del users[request.sid]
