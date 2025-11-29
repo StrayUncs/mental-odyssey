@@ -1,4 +1,5 @@
 import os
+import sys
 import getpass
 from xml.parsers.expat import model
 from langchain.chat_models import init_chat_model
@@ -8,6 +9,9 @@ from langchain.agents import create_agent
 
 basic_agent = None
 advice_agent = None
+
+query = sys.argv[1] if len(sys.argv) > 1 else "test"
+print("You passed:", query)
 
 def __init__():
     global basic_agent, advice_agent
@@ -82,8 +86,6 @@ def __init__():
         tools=[schedule_basic, schedule_advice],
         system_prompt=SUPERVISOR_PROMPT,
     )
-
-    query = "Hello, my name is Bob, I did self harm today."
 
     # for step in supervisor_agent.stream(
     #     {"messages": [{"role": "user", "content": query}]}
