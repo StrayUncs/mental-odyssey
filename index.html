@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Chat App</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#10B981', // Emerald Green
+                        secondary: '#F3F4F6', // Light Gray background
+                        darkbg: '#1F2937', // Dark Slate
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom CSS to ensure smooth scrolling and flexible chat area */
+        .chat-feed {
+            /* Scrollable area, takes remaining height */
+            overflow-y: auto;
+        }
+        /* Style for the text input area */
+        .chat-input-area textarea {
+            min-height: 2.5rem; /* Ensure visibility for single line */
+            max-height: 8rem; /* Limit vertical growth */
+        }
+        
+        /* --- NEW STYLES FOR CIRCULAR LAYOUT --- */
+        .center-circle-container {
+            /* Defines the size of the circle area */
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin: 0 auto; /* Center the circle container horizontally */
+            margin-top: 10px;
+        }
+        .profile-pictures {
+            /* The container for absolute children */
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        /* Position images absolutely and center their own origin point */
+        .profile-pic, .profile-count {
+            position: absolute; 
+            transform: translate(-50%, -50%); 
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-100 min-h-screen antialiased flex items-center justify-center p-4">
+
+    <!-- Overall Desktop Container -->
+    <div class="desktop-container flex w-full max-w-7xl h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+
+        <!-- 1. Left Sidebar (Fixed Navigation Panel) -->
+        <aside class="w-20 bg-darkbg flex flex-col items-center py-6 border-r border-gray-700">
+            
+            <!-- User Profile Section -->
+            <div class="mb-10">
+                <img src="https://placehold.co/60x60/34D399/FFFFFF?text=YOU" 
+                     alt="Your Profile" 
+                     class="w-12 h-12 rounded-full ring-2 ring-primary cursor-pointer transition duration-200 hover:scale-105"
+                     onerror="this.onerror=null; this.src='https://placehold.co/60x60/10B981/FFFFFF?text=U'">
+            </div>
+
+            <!-- Hand Raise Icon -->
+            <button class="p-3 mb-6 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 group" title="Raise Hand">
+                <!-- 'Hand Raise' Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                    <path d="M18 10V5a2 2 0 0 0-2-2c-1 0-1.5.5-2.5 1.5A3.5 3.5 0 0 0 7 7v7H4c-1.25 0-2 .75-2 2v3c0 1.25.75 2 2 2h14c1.25 0 2-.75 2-2v-2c0-2-1.5-4-3.5-4h-2.5z"/>
+                </svg>
+            </button>
+            
+            <!-- Leave Door / Log Out Icon (fixed to the bottom) -->
+            <div class="mt-auto">
+                <button class="p-3 rounded-lg text-red-400 hover:bg-gray-700 hover:text-red-300 transition duration-150 group" title="Leave/Log Out">
+                    <!-- 'Log Out' Icon (The 'leave door' icon) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+            
+        </aside>
+
+        <!-- 2. Main Chat Area (Flexible Content) -->
+        <div class="chat-container flex-1 flex flex-col min-w-0">
+
+            <!-- A. Header with Circular Profiles -->
+            <header class="chat-header bg-white p-4 border-b border-gray-200 shadow-sm flex flex-col items-center">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Project Alpha Team Chat</h3>
+                
+                <div class="center-circle-container">
+                    <div id="profile-pictures" class="profile-pictures">
+                        <!-- Images for JS positioning -->
+                        <img src="https://placehold.co/40x40/FF5733/FFFFFF?text=A" alt="Profile 1" class="profile-pic w-10 h-10 rounded-full border-2 border-white shadow-lg">
+                        <img src="https://placehold.co/40x40/33FF57/FFFFFF?text=B" alt="Profile 2" class="profile-pic w-10 h-10 rounded-full border-2 border-white shadow-lg">
+                        <img src="https://placehold.co/40x40/3357FF/FFFFFF?text=C" alt="Profile 3" class="profile-pic w-10 h-10 rounded-full border-2 border-white shadow-lg">
+                        <img src="https://placehold.co/40x40/FF33A1/FFFFFF?text=D" alt="Profile 4" class="profile-pic w-10 h-10 rounded-full border-2 border-white shadow-lg">
+                        <!-- The +4 count -->
+                        <span class="profile-count w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-500 border-2 border-white shadow-lg">
+                            +4
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- B. Main Chat Feed Area -->
+            <main class="chat-feed flex-1 p-6 space-y-4 bg-secondary">
+                <!-- Example Messages -->
+                <div class="flex justify-start">
+                    <div class="message received bg-white text-gray-800 p-3 rounded-tr-xl rounded-b-xl max-w-md shadow-md">
+                        <p class="font-semibold text-sm mb-1">Jane Doe</p>
+                        <p>Hey team, just confirming the meeting for 2 PM today. Does everyone have the updated brief?</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <div class="message sent bg-primary text-white p-3 rounded-tl-xl rounded-b-xl max-w-md shadow-md">
+                        <p>Confirmed on my end. The new feature list looks solid!</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-start">
+                    <div class="message received bg-white text-gray-800 p-3 rounded-tr-xl rounded-b-xl max-w-md shadow-md">
+                        <p class="font-semibold text-sm mb-1">Alex K.</p>
+                        <p>I saw it! Just finishing up the final tests on the UI component before the meeting.</p>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- C. Text Input Section at the Bottom -->
+            <footer class="chat-input-area bg-white p-4 border-t border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <textarea 
+                        placeholder="Send a message..." 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150 resize-none overflow-y-auto"
+                        rows="1"
+                        oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                    ></textarea>
+                    <button class="bg-primary text-white p-3 rounded-lg font-semibold shadow-md hover:bg-emerald-600 transition duration-150 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 15 2 11 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- JavaScript for Circular Positioning -->
+    <script>
+        // Function to position elements in a circle using trigonometry
+        function layoutProfilesInCircle() {
+            const container = document.getElementById('profile-pictures');
+            if (!container) return;
+
+            // Select all children to be placed in the circle (images and the '+4' span)
+            const elements = container.children;
+            const count = elements.length;
+
+            // Get the container's size (150px defined in CSS)
+            const radius = container.offsetWidth / 2;
+            const centerX = radius;
+            const centerY = radius;
+
+            // Use 80% of the radius for positioning to prevent images from touching the edge
+            const positioningRadius = radius * 0.8; 
+
+            for (let i = 0; i < count; i++) {
+                const element = elements[i];
+                
+                // Calculate the angle for this element
+                // Starts the first element at the top (-90 degrees offset)
+                const angle = (2 * Math.PI / count) * i - (Math.PI / 2);
+
+                // Calculate x and y coordinates on the circumference
+                const x = centerX + positioningRadius * Math.cos(angle);
+                const y = centerY + positioningRadius * Math.sin(angle);
+
+                // Apply absolute positioning (CSS transform centers the image on these coordinates)
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
+            }
+        }
+
+        // Run the positioning function when the page loads
+        window.addEventListener('load', layoutProfilesInCircle);
+        
+        // Handle resizing (though the container is fixed size, this ensures correctness if that changes)
+        window.addEventListener('resize', layoutProfilesInCircle); 
+    </script>
+</body>
+</html>
