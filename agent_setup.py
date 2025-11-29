@@ -5,7 +5,7 @@ from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from langchain.tools import tool
 from langchain.agents import create_agent
-from agents.agents import anxiety_agent, greeting_agent, friend_agent, helpline_agent, relationship_agent, warden_agent
+from agents import anxiety_agent, greeting_agent, friend_agent, helpline_agent, relationship_agent, warden_agent
 
 def __init__():
     global supervisor_agent

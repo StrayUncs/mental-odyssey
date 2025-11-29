@@ -3,7 +3,12 @@ from xml.parsers.expat import model
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-import tools
+from tools import (greet_user, response_to_greeting,
+                   provide_anxiety_advice, suggest_resources,
+                   small_talk_tool, positive_reinforcement_tool,
+                   suicide_hotline_lookup, emergency_response_tool,
+                   relationship_advice_tool, communication_tips_tool,
+                   moderation_tool, rephrase_tool)
 
 load_dotenv()
 
@@ -23,7 +28,7 @@ GREETING_AGENT_PROMPT = (
 
 greeting_agent = create_agent(
     model,
-    tools=[tools.greet_user, tools.response_to_greeting],
+    tools=[greet_user, response_to_greeting],
     system_prompt=GREETING_AGENT_PROMPT,
 )
 
@@ -37,7 +42,7 @@ ANXIETY_AGENT_PROMPT = (
 
 anxiety_agent = create_agent(
     model,
-    tools=[tools.provide_anxiety_advice, tools.suggest_resources],
+    tools=[provide_anxiety_advice, suggest_resources],
     system_prompt=ANXIETY_AGENT_PROMPT,
 )
 
@@ -51,7 +56,7 @@ FRIEND_AGENT_PROMPT = (
 
 friend_agent = create_agent(
     model,
-    tools=[tools.small_talk_tool, tools.positive_reinforcement_tool],
+    tools=[small_talk_tool, positive_reinforcement_tool],
     system_prompt=FRIEND_AGENT_PROMPT,
 )
 
@@ -65,7 +70,7 @@ HELPLINE_AGENT_PROMPT = (
 
 helpline_agent = create_agent(
     model,
-    tools=[tools.suicide_hotline_lookup, tools.emergency_response_tool],
+    tools=[suicide_hotline_lookup, emergency_response_tool],
     system_prompt=HELPLINE_AGENT_PROMPT,
 )
 
@@ -79,7 +84,7 @@ RELATIONSHIP_AGENT_PROMPT = (
 
 relationship_agent = create_agent(
     model,
-    tools=[tools.relationship_advice_tool, tools.communication_tips_tool],
+    tools=[relationship_advice_tool, communication_tips_tool],
     system_prompt=RELATIONSHIP_AGENT_PROMPT,
 )
 
@@ -94,6 +99,6 @@ WARDEN_AGENT_PROMPT = (
 
 warden_agent = create_agent(
     model,
-    tools=[tools.moderation_tool, tools.rephrase_tool],
+    tools=[moderation_tool, rephrase_tool],
     system_prompt=WARDEN_AGENT_PROMPT,
 )
