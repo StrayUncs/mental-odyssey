@@ -38,8 +38,8 @@
       /* Left Panel - Profile & Controls */
       .left-panel {
         width: 80px; /* collapsed sidebar width */
-        background: #5b8fd9;
-        border-right: 2px solid #4a7bc0;
+        background: #4a7bc8;
+        border-right: 2px solid #3a6ab0;
         display: flex;
         flex-direction: column;
         padding: 12px 8px;
@@ -68,7 +68,6 @@
         object-fit: cover;
         box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
         cursor: pointer;
-        transition: all 0.3s;
         position: relative;
         overflow: hidden;
       }
@@ -105,7 +104,6 @@
       #entry-join-btn { padding: 10px 16px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; }
 
       .profile-img:hover {
-        transform: scale(1.05);
         box-shadow: 0 6px 16px rgba(74, 144, 226, 0.5);
       }
 
@@ -175,7 +173,7 @@
         align-items: center;
         justify-content: center;
         font-size: 18px;
-        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+        transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease, background 0.08s ease;
       }
 
       /* Icon styles */
@@ -188,8 +186,8 @@
         background: linear-gradient(90deg, #FFD54F 0%, #FFC107 100%);
         color: #222;
       }
-      #raise-hand-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(255,193,7,0.18); }
-      #raise-hand-btn:active { transform: translateY(-1px) scale(0.99); }
+      #raise-hand-btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(255,193,7,0.3); }
+      #raise-hand-btn:active { transform: scale(1.02); }
 
       /* Lower hand / cancel (muted) */
       #lower-hand-btn {
@@ -266,7 +264,7 @@
 
       #leave-btn:hover {
         background: #c82333;
-        transform: translateY(-2px);
+        transform: translateX(-50%) scale(1.08);
         box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
       }
 
@@ -925,9 +923,11 @@
           if (currentUsername === currentSpeaker) {
             messageInput.disabled = false;
             sendBtn.disabled = false;
+            messageInput.placeholder = 'Type message...';
           } else {
             messageInput.disabled = true;
             sendBtn.disabled = true;
+            messageInput.placeholder = 'You are in the queue';
           }
         }
       });
@@ -955,6 +955,7 @@
         inputArea.style.display = 'flex';
         messageInput.disabled = true;
         sendBtn.disabled = true;
+        messageInput.placeholder = 'Raise hand to join queue';
         // sidebar is compact; profile display is handled via avatar image only
         messageInput.focus();
         
@@ -991,6 +992,7 @@
         handRaised = true;
         raiseHandBtn.style.display = 'none';
         lowerHandBtn.style.display = 'block';
+        messageInput.placeholder = 'You are in the queue';
         // Don't enable input here - wait for current_speaker_update to confirm if this user is first
       });
 
@@ -1001,6 +1003,7 @@
         lowerHandBtn.style.display = 'none';
         messageInput.disabled = true;
         sendBtn.disabled = true;
+        messageInput.placeholder = 'Raise hand to join queue';
       });
       
       if (profilePicInput && profileImgDisplay) {
