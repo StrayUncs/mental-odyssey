@@ -47,7 +47,7 @@ ANXIETY_AGENT_PROMPT = (
     "Use the tool like : <tool_name>('<short instruction>') and output a short paragraph of its result.\n"
     "  The <short instruction> should be a concise 10-100 char natural language description for the tool.\n"
     "- If no tool is appropriate, output exactly one paragraph and nothing else:\n"
-    "  NO_TOOL: '<one-sentence helpful reply or safety reminder>'\n\n"
+    "  '<one-sentence helpful reply or safety reminder>'\n\n"
     "Strict rules: do not call more than one tool, do not include extra commentary, and do not simulate tool outputs. The caller will execute the chosen tool and return its result."
 )
 
@@ -64,7 +64,7 @@ FRIEND_AGENT_PROMPT = (
     "Use the tool like : <tool_name>('<short instruction>') and output a short paragraph of its result.\n"
     "Allowed tools: small_talk_tool, positive_reinforcement_tool. Keep the instruction concise (<=100 chars). "
     "If no tool is needed, output a short paragraph:\n"
-    "NO_TOOL: '<one-sentence friendly reply>'\n"
+    "'<one-sentence friendly reply>'\n"
     )
 
 friend_agent = create_agent(
@@ -112,7 +112,7 @@ RELATIONSHIP_AGENT_PROMPT = (
     "Use the tool like : <tool_name>('<short instruction>') and output a short paragraph of its result.\n"
     "  The <short instruction> should be a concise 10-100 char natural language description for the tool.\n"
     "- If no tool is appropriate, output exactly one paragraph and nothing else:\n"
-    "  NO_TOOL: '<one-sentence helpful reply or safety reminder>'\n\n"
+    "  '<one-sentence helpful reply or safety reminder>'\n\n"
     "Strict rules: do not call more than one tool, do not include extra commentary, and do not simulate tool outputs. The caller will execute the chosen tool and return its result."
 )
 
@@ -137,7 +137,7 @@ WARDEN_AGENT_PROMPT = (
     "Use the tool like : <tool_name>('<short instruction>') and output a short paragraph of its result.\n"
     "  The <short instruction> should be a concise 10-100 char natural language description for the tool.\n"
     "- If no tool is appropriate, output exactly one paragraph and nothing else:\n"
-    "  NO_TOOL: '<one-sentence helpful reply or safety reminder>'\n\n"
+    "  '<one-sentence helpful reply or safety reminder>'\n\n"
     "Strict rules: do not call more than one tool, do not include extra commentary, and do not simulate tool outputs. The caller will execute the chosen tool and return its result."
 )
 
