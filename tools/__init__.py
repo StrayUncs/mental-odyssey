@@ -4,3 +4,4 @@ from .greeting_tools import greet_user, response_to_greeting
 from .helpline_tools import suicide_hotline_lookup, emergency_response_tool
 from .relationship_tools import relationship_advice_tool, communication_tips_tool
 from .warden_tools import moderation_tool, rephrase_tool
+from .text_util import extract_text

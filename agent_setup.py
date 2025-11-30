@@ -165,4 +165,56 @@ def run_query(query: str) -> str:
             return tool_output
     return ""
 
+    # if supervisor_agent is None:
+    #     __init__()  # lazy init if not already done
+    # tool_output = None
+    # called_tool = None
+
+    # for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
+    #     for update in step.values():
+    #         # dict-like updates
+    #         if isinstance(update, dict):
+    #             # detect tool-call metadata (various shapes)
+    #             if "tool_call" in update:
+    #                 tc = update["tool_call"]
+    #                 if isinstance(tc, dict):
+    #                     called_tool = called_tool or (tc.get("name") or tc.get("tool_name") or tc.get("tool"))
+    #                 else:
+    #                     called_tool = called_tool or getattr(tc, "name", None) or getattr(tc, "tool_name", None)
+    #             if "tool_name" in update and not called_tool:
+    #                 called_tool = update.get("tool_name")
+    #             if "name" in update and not called_tool:
+    #                 maybe = update.get("name")
+    #                 if isinstance(maybe, str) and maybe.startswith("schedule_"):
+    #                     called_tool = maybe
+
+    #             # extract tool result / messages
+    #             for key in ("tool_result", "tool_response", "tool_output", "result"):
+    #                 if key in update and update[key]:
+    #                     tool_output = update[key]
+    #             for m in update.get("messages", []):
+    #                 tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+
+    #         else:
+    #             # object-like updates
+    #             tc = getattr(update, "tool_call", None) or getattr(update, "tool", None)
+    #             if tc:
+    #                 if isinstance(tc, dict):
+    #                     called_tool = called_tool or (tc.get("name") or tc.get("tool_name") or tc.get("tool"))
+    #                 else:
+    #                     called_tool = called_tool or getattr(tc, "name", None) or getattr(tc, "tool_name", None)
+
+    #             tr = getattr(update, "tool_result", None) or getattr(update, "tool_response", None) or getattr(update, "tool_output", None)
+    #             if tr:
+    #                 tool_output = tr
+
+    #             for m in getattr(update, "messages", []) or []:
+    #                 tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
+
+    #     if tool_output:
+    #         return {"tool_output": tool_output, "agent": called_tool}
+
+    # # no tool output found
+    # return {"tool_output": "", "agent": called_tool}
+
 __init__()
