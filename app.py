@@ -32,7 +32,9 @@ def handle_connect():
 
 @socketio.on('join_room')
 def on_join(data):
-    username = data['username']
+    username = data['username'].strip()
+    # Capitalize first letter of username
+    username = username[0].upper() + username[1:] if username else username
     profile_image = data.get('profile_image', None)  # Get profile image if provided
     
     print(f"User {username} joining, profile image: {profile_image is not None}")
@@ -91,19 +93,30 @@ def on_send_message(data):
     # Store message
     room_data['messages'].append(message_data)
     
-    # Broadcast to all users
+    # Broadcast user message to all users
     emit('new_message', message_data, room=CHAT_ROOM)
 
-    # Send message to superviser agent
-    result = run_query(message)
-
+    # Show typing indicator
+    emit('therapist_typing', {'username': 'Therapist'}, room=CHAT_ROOM)
+    
+    # Get therapist response
+    try:
+        result = run_query(message)
+    except Exception as e:
+        result = f"I encountered an error processing your message: {str(e)}"
+    
+    # Hide typing indicator and send response
     result_data = {
-        'username': "therapist",
+        'username': 'Therapist',
         'message': result,
-        'timestamp': timestamp
+        'timestamp': datetime.now().strftime('%H:%M:%S')
     }
     
+    emit('therapist_stopped_typing', {}, room=CHAT_ROOM)
     emit('new_message', result_data, room=CHAT_ROOM)
+    
+    # Store therapist message
+    room_data['messages'].append(result_data)
 
 
 @socketio.on('leave_room')

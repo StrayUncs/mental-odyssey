@@ -358,10 +358,9 @@
       }
 
       .chat-header {
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
         color: white;
-        border-bottom: 2px solid #e0e0e0;
+        border-bottom: 2px
       }
 
       .chat-header h2 {
@@ -382,6 +381,62 @@
         display: flex;
         gap: 10px;
         animation: slideIn 0.3s ease;
+        align-items: center;
+      }
+
+      /* Align current user's messages to the right, others to the left */
+      .message.me {
+        justify-content: flex-end;
+      }
+
+      /* When message is from current user place content before avatar */
+      .message.me .message-content {
+        text-align: right;
+      }
+
+      .message .message-avatar {
+        margin-right: 8px;
+        align-self: center;
+      }
+
+      .message.me .message-avatar {
+        margin-left: 8px;
+        margin-right: 0;
+      }
+
+      /* Message content layout & alignment */
+      .message .message-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .message.me .message-content {
+        align-items: flex-end;
+      }
+
+      .message .message-header {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .message.me .message-header {
+        justify-content: flex-end;
+      }
+
+      /* Distinct bubble color for the current user */
+      .message.me .message-text {
+        background: #4f46e5; /* indigo */
+        color: #fff;
+        border-radius: 12px;
+      }
+
+      /* Slightly different rounding for other users to visually separate */
+      .message:not(.me) .message-text {
+        background: #f1f1f1;
+        color: #333;
+        border-radius: 12px;
       }
 
       .message.system {
@@ -410,10 +465,8 @@
         flex-shrink: 0;
       }
 
-      /* Let message content size to its content (shrink for short messages) */
       .message-content {
-        flex: 0 1 auto;
-        max-width: 70%;
+        flex: 1;
       }
 
       .message-header {
@@ -441,10 +494,50 @@
         font-size: 13px;
         line-height: 1.4;
         word-wrap: break-word;
-        display: inline-block; /* shrink to content */
-        max-width: 60vw; /* prevent overly wide bubbles */
+        display: inline-block;
+        max-width: 60vw;
         white-space: pre-wrap;
         word-break: break-word;
+      }
+
+      /* Typing indicator */
+      .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 12px;
+        /* background: #f1f1f1; */
+        border-radius: 6px;
+        color: #999;
+        font-size: 13px;
+        height: 20px;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #999;
+        animation: typingBounce 1.4s infinite;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typingBounce {
+        0%, 60%, 100% {
+          transform: translateY(0);
+          opacity: 0.7;
+        }
+        30% {
+          transform: translateY(-10px);
+          opacity: 1;
+        }
       }
 
       .empty-state {
@@ -588,13 +681,14 @@
           <button id="lower-hand-btn" style="display: none; background: #999; color: white;">Lower Hand</button>
           <button id="leave-btn">Leave</button>
         </div>
+      </div>
 
-        <div class="middle-panel">
-          <div class="members-header">Room Members</div>
-          <div class="members-circle-container">
-            <div class="members-circle" id="members-circle">
-              <div class="center-user" id="center-user"></div>
-            </div>
+          <!-- Middle Panel -->
+      <div class="middle-panel">
+        <div class="members-header">Room Members</div>
+        <div class="members-circle-container">
+          <div class="members-circle" id="members-circle">
+            <div class="center-user" id="center-user"></div>
           </div>
         </div>
       </div>
@@ -677,11 +771,21 @@
       });
 
       socket.on('new_message', (data) => {
+        // Hide typing indicator when message arrives
+        hideTypingIndicator();
         addMessage(data.username, data.message, data.timestamp);
       });
 
       socket.on('error', (data) => {
         alert('Error: ' + data.message);
+      });
+
+      socket.on('therapist_typing', (data) => {
+        showTypingIndicator(data.username || 'Therapist');
+      });
+
+      socket.on('therapist_stopped_typing', (data) => {
+        hideTypingIndicator();
       });
 
       socket.on('left_room', (data) => {
@@ -713,13 +817,15 @@
 
       // UI Event Handlers
       connectBtn.addEventListener('click', () => {
-        const username = usernameInput.value.trim();
+        let username = usernameInput.value.trim();
 
         if (!username) {
           alert('Please enter a username');
           return;
         }
 
+        // Capitalize first letter
+        username = username.charAt(0).toUpperCase() + username.slice(1);
         currentUsername = username;
         isConnected = true;
 
@@ -828,7 +934,72 @@
 
       function addMessage(username, message, timestamp) {
         const messageEl = document.createElement('div');
+        // mark whether this message is from the current user
+        const isMe = username === currentUsername;
+        messageEl.className = 'message' + (isMe ? ' me' : '');
+
+        const initial = username.charAt(0).toUpperCase();
+        const colors = [
+          '#667eea',
+          '#764ba2',
+          '#f093fb',
+          '#4facfe',
+          '#00f2fe',
+        ];
+        const colorIndex = username.charCodeAt(0) % colors.length;
+        const bgColor = colors[colorIndex];
+
+        // Display name: use "You" for local user's messages
+        const displayName = isMe ? 'You' : escapeHtml(username);
+
+        if (isMe) {
+          // For current user: content first, avatar on the right
+          messageEl.innerHTML = `
+            <div class="message-content">
+              <div class="message-header">
+                <span class="message-username">${displayName}</span>
+                <span class="message-time">${timestamp}</span>
+              </div>
+              <div class="message-text">${escapeHtml(message)}</div>
+            </div>
+            <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
+          `;
+        } else {
+          // For others: avatar first, content after
+          messageEl.innerHTML = `
+            <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
+            <div class="message-content">
+              <div class="message-header">
+                <span class="message-username">${displayName}</span>
+                <span class="message-time">${timestamp}</span>
+              </div>
+              <div class="message-text">${escapeHtml(message)}</div>
+            </div>
+          `;
+        }
+
+        messagesDiv.appendChild(messageEl);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      function addSystemMessage(message) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'message system';
+        messageEl.innerHTML = `
+          <div class="text">${escapeHtml(message)}</div>
+        `;
+
+        messagesDiv.appendChild(messageEl);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      function showTypingIndicator(username = 'Therapist') {
+        // Remove existing typing indicator if any
+        hideTypingIndicator();
+
+        const messageEl = document.createElement('div');
         messageEl.className = 'message';
+        messageEl.id = 'typing-indicator-msg';
 
         const initial = username.charAt(0).toUpperCase();
         const colors = [
@@ -844,11 +1015,12 @@
         messageEl.innerHTML = `
           <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
           <div class="message-content">
-            <div class="message-header">
-              <span class="message-username">${escapeHtml(username)}</span>
-              <span class="message-time">${timestamp}</span>
+            <div class="typing-indicator">
+              <span>${username} is thinking</span>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
             </div>
-            <div class="message-text">${escapeHtml(message)}</div>
           </div>
         `;
 
@@ -856,15 +1028,11 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      function addSystemMessage(message) {
-        const messageEl = document.createElement('div');
-        messageEl.className = 'message system';
-        messageEl.innerHTML = `
-          <div class="text">${escapeHtml(message)}</div>
-        `;
-
-        messagesDiv.appendChild(messageEl);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      function hideTypingIndicator() {
+        const typingMsg = document.getElementById('typing-indicator-msg');
+        if (typingMsg) {
+          typingMsg.remove();
+        }
       }
 
       function updateMembersList(users) {
