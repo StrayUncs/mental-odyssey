@@ -118,13 +118,18 @@ def on_send_message(data):
     # Broadcast user message to all users
     emit('new_message', message_data, room=CHAT_ROOM)
 
-    # Show typing indicator
-    emit('therapist_typing', {'username': 'Therapist'}, room=CHAT_ROOM)
+    # Show initial typing indicator
+    emit('therapist_typing', {'username': 'Therapist', 'status': 'analyzing'}, room=CHAT_ROOM)
+    
+    # Define callback to update UI when specialist is identified
+    def on_specialist_identified(specialist_name):
+        emit('therapist_typing', {'username': 'Therapist', 'specialist': specialist_name}, room=CHAT_ROOM)
     
     # Get therapist response
     try:
-        result = run_query(message)
+        specialist_name, result = run_query(message, specialist_callback=on_specialist_identified)
     except Exception as e:
+        specialist_name = "Specialist"
         result = f"I encountered an error processing your message: {str(e)}"
     
     # Hide typing indicator and send response

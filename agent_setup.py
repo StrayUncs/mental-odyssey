@@ -15,7 +15,7 @@ def __init__():
         os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
     
-    model = init_chat_model("gpt-5")
+    model = init_chat_model("gpt-4o-mini")
     
     ## supervisor agent 
 
@@ -143,14 +143,46 @@ def schedule_warden(request: str) -> str:
     return str(result)
 
 # function to run queries from other files
-def run_query(query: str) -> str:
+def run_query(query: str, specialist_callback=None) -> tuple[str, str]:
+    """Run query and return (specialist_name, response)
+    
+    Args:
+        query: The user's message
+        specialist_callback: Optional function called with specialist_name as soon as it's identified
+    """
     global supervisor_agent
     if supervisor_agent is None:
         __init__()  # lazy init if not already done
+    
     tool_output = None
+    specialist_name = None
+    specialist_notified = False
+    
+    # Map tool names to friendly specialist names
+    specialist_map = {
+        "schedule_greeting": "Greeting Specialist",
+        "schedule_anxiety": "Anxiety Specialist",
+        "schedule_friend": "Supportive Friend",
+        "schedule_helpline": "Crisis Specialist",
+        "schedule_relationship": "Relationship Specialist",
+        "schedule_warden": "Safety Moderator"
+    }
+    
     for step in supervisor_agent.stream({"messages": [{"role": "user", "content": query}] }):
         for update in step.values():
             if isinstance(update, dict):
+                # Check for tool calls to identify specialist
+                for m in update.get("messages", []):
+                    if hasattr(m, "tool_calls") and m.tool_calls:
+                        for tool_call in m.tool_calls:
+                            tool_name = tool_call.get("name") if isinstance(tool_call, dict) else getattr(tool_call, "name", None)
+                            if tool_name and tool_name in specialist_map:
+                                specialist_name = specialist_map[tool_name]
+                                # Notify immediately when specialist is identified
+                                if not specialist_notified and specialist_callback:
+                                    specialist_callback(specialist_name)
+                                    specialist_notified = True
+                
                 for key in ("tool_result", "tool_response", "tool_output", "result"):
                     if key in update and update[key]:
                         tool_output = update[key]
@@ -162,8 +194,8 @@ def run_query(query: str) -> str:
                 for m in getattr(update, "messages", []) or []:
                     tool_output = getattr(m, "content", None) or getattr(m, "text", None) or tool_output
         if tool_output:
-            return tool_output
-    return ""
+            return (specialist_name or "Specialist", tool_output)
+    return ("Specialist", "")
 
     # if supervisor_agent is None:
     #     __init__()  # lazy init if not already done

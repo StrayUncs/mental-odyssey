@@ -862,7 +862,8 @@
       });
 
       socket.on('therapist_typing', (data) => {
-        showTypingIndicator(data.username || 'Therapist');
+        const status = data.specialist ? `consulting ${data.specialist}` : (data.status === 'analyzing' ? 'understanding your message' : 'thinking');
+        showTypingIndicator(data.username || 'Therapist', status);
       });
 
       socket.on('therapist_stopped_typing', (data) => {
@@ -1075,7 +1076,7 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      function showTypingIndicator(username = 'Therapist') {
+      function showTypingIndicator(username = 'Therapist', status = 'thinking') {
         // Remove existing typing indicator if any
         hideTypingIndicator();
 
@@ -1098,7 +1099,7 @@
           <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
           <div class="message-content">
             <div class="typing-indicator">
-              <span>${username} is thinking</span>
+              <span>${username} is ${status}</span>
               <div class="typing-dot"></div>
               <div class="typing-dot"></div>
               <div class="typing-dot"></div>
