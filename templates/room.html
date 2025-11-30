@@ -21,7 +21,7 @@
 
       body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4a90e2 0%, #5b7fc9 100%);
         min-height: 100vh;
         display: flex;
         align-items: stretch;
@@ -38,8 +38,8 @@
       /* Left Panel - Profile & Controls */
       .left-panel {
         width: 80px; /* collapsed sidebar width */
-        background: #d66cc4;
-        border-right: 2px solid #e0e0e0;
+        background: #5b8fd9;
+        border-right: 2px solid #4a7bc0;
         display: flex;
         flex-direction: column;
         padding: 12px 8px;
@@ -58,7 +58,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #5b9ee6 0%, #4a90e2 100%);
         margin: 0 auto 15px;
         display: flex;
         align-items: center;
@@ -66,7 +66,7 @@
         color: white;
         font-size: 28px;
         object-fit: cover;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
         cursor: pointer;
         transition: all 0.3s;
         position: relative;
@@ -98,15 +98,15 @@
 
       .entry-profile-pic { width: 84px; height: 84px; margin: 0 auto 12px; position: relative; }
       .entry-profile-pic input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-      .entry-profile-pic .profile-img-display { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; }
+      .entry-profile-pic .profile-img-display { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #5b9ee6 0%, #4a90e2 100%); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; }
 
       #entry-username { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; }
       #entry-members-list { font-size: 13px; color: #666; min-height: 32px; margin-bottom: 6px; }
-      #entry-join-btn { padding: 10px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+      #entry-join-btn { padding: 10px 16px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; }
 
       .profile-img:hover {
         transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 16px rgba(74, 144, 226, 0.5);
       }
 
       .profile-img input {
@@ -124,10 +124,34 @@
         align-items: center;
         justify-content: center;
         pointer-events: none;
+        overflow: hidden;
+        border-radius: 50%;
       }
 
-      /* Hide full profile name/status in compact sidebar; show on hover if needed */
-      .profile-name, .profile-status {
+      .profile-img-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .profile-img-display i {
+        font-size: 32px;
+        color: #fff;
+      }
+
+      /* Show profile name in compact sidebar below avatar */
+      .profile-name {
+        display: block;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-top: 8px;
+        padding: 0 10px;
+        word-break: break-word;
+      }
+      
+      .profile-status {
         display: none;
       }
 
@@ -197,8 +221,8 @@
 
       .controls-section input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
       }
 
       .controls-section input:disabled {
@@ -215,13 +239,13 @@
         font-weight: 600;
         transition: all 0.3s;
         width: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4a90e2 0%, #5b7fc9 100%);
         color: white;
       }
 
       #connect-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
       }
 
       #connect-btn:disabled {
@@ -289,7 +313,7 @@
         font-weight: 600;
         color: #ffffff;
         /* background: #f9f9f9; */
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4a90e2 0%, #5b7fc9 100%);
 
         border-bottom: 2px solid #e0e0e0;
         text-align: center;
@@ -324,10 +348,10 @@
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        border: 4px solid #667eea;
+        border: 4px solid #4a90e2;
         object-fit: cover;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4a90e2 0%, #5b7fc9 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -407,7 +431,7 @@
         height: 56px;
         border-radius: 50%;
         box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-        background: #667eea;
+        background: #4a90e2;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -420,7 +444,7 @@
       .chat-header {
         padding: 1rem;
         color: white;
-        border-bottom: 2px
+        border-bottom: 2px;
       }
 
       .chat-header h2 {
@@ -638,7 +662,7 @@
 
       .message-input-area input:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #4a90e2;
       }
 
       .message-input-area input:disabled {
@@ -648,7 +672,7 @@
 
       #send-btn {
         padding: 8px 16px;
-        background: #667eea;
+        background: #4a90e2;
         color: white;
         border: none;
         border-radius: 6rem;
@@ -723,7 +747,7 @@
           <h2>Join Room</h2>
           <div class="entry-profile-pic">
             <input type="file" id="profile-pic-input" accept="image/*" />
-            <div class="profile-img-display">
+            <div class="profile-img-display" id="entry-profile-display">
               <i class="fas fa-camera"></i>
             </div>
           </div>
@@ -738,11 +762,11 @@
       <div class="left-panel">
         <div class="profile-section">
           <div class="profile-img" id="profile-img-container">
-            <div class="profile-img-display">
+            <div class="profile-img-display" id="sidebar-avatar">
               <i class="fas fa-camera"></i>
             </div>
           </div>
-          <!-- compact sidebar: name/status removed (shown in overlay only) -->
+          <div class="profile-name" id="sidebar-username" style="display: none;"></div>
         </div>
 
         <div class="controls-section">
@@ -803,10 +827,15 @@
       const centerUser = document.getElementById('center-user');
       // profile name/status removed from sidebar; overlay manages join info
       const profilePicInput = document.getElementById('profile-pic-input');
-      const profileImgDisplay = document.querySelector('.profile-img-display');
+      const profileImgDisplay = document.getElementById('entry-profile-display');
+      
+      console.log('profilePicInput found:', profilePicInput);
+      console.log('profileImgDisplay found:', profileImgDisplay);
+      
       const raiseHandBtn = document.getElementById('raise-hand-btn');
       const lowerHandBtn = document.getElementById('lower-hand-btn');
       let userProfileImage = null;
+      let usersMap = {}; // Store users with their profile images
 
       // show the overlay on load
       entryOverlay.style.display = 'flex';
@@ -816,6 +845,12 @@
       });
 
       socket.on('users_update', (data) => {
+        // Update global users map with profile images
+        data.users.forEach(u => {
+          const username = typeof u === 'string' ? u : u.name;
+          const profileImage = typeof u === 'string' ? null : u.image;
+          usersMap[username] = profileImage;
+        });
         updateMembersList(data.users);
         // update entry overlay members list if visible
         if (entryOverlay && entryOverlay.style.display !== 'none') {
@@ -922,6 +957,25 @@
         sendBtn.disabled = true;
         // sidebar is compact; profile display is handled via avatar image only
         messageInput.focus();
+        
+        // Update left sidebar with user profile picture and name
+        const sidebarAvatar = document.getElementById('sidebar-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        
+        if (userProfileImage) {
+          sidebarAvatar.innerHTML = `<img src="${userProfileImage}" alt="${username}" />`;
+        } else {
+          const initial = username.charAt(0).toUpperCase();
+          const colors = ['#4a90e2', '#5b7fc9', '#6ba3e8', '#3a7bc0', '#4f8cd9'];
+          const colorIndex = username.charCodeAt(0) % colors.length;
+          sidebarAvatar.style.background = colors[colorIndex];
+          sidebarAvatar.style.color = 'white';
+          sidebarAvatar.style.fontSize = '32px';
+          sidebarAvatar.style.fontWeight = '600';
+          sidebarAvatar.innerHTML = initial;
+        }
+        sidebarUsername.textContent = username;
+        sidebarUsername.style.display = 'block';
       });
 
       entryUsernameInput.addEventListener('keypress', (e) => {
@@ -949,14 +1003,19 @@
         sendBtn.disabled = true;
       });
       
-      profilePicInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
+      if (profilePicInput && profileImgDisplay) {
+        profilePicInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          console.log('File selected:', file ? file.name : 'none');
+          console.log('Profile display element:', profileImgDisplay);
+          if (file) {
           const reader = new FileReader();
           reader.onload = (event) => {
+            console.log('File loaded, creating image...');
             // Compress image before storing
             const img = new Image();
             img.onload = () => {
+              console.log('Image loaded, compressing...');
               const canvas = document.createElement('canvas');
               const maxWidth = 200;
               const maxHeight = 200;
@@ -983,13 +1042,17 @@
               // Compress to JPEG with lower quality
               userProfileImage = canvas.toDataURL('image/jpeg', 0.6);
               console.log('Profile image compressed, size:', userProfileImage.length);
+              console.log('Updating profileImgDisplay element');
               profileImgDisplay.innerHTML = `<img src="${userProfileImage}" style="width: 100%; height: 100%; object-fit: cover;">`;
             };
             img.src = event.target.result;
           };
           reader.readAsDataURL(file);
         }
-      });
+        });
+      } else {
+        console.error('Profile picture elements not found!', {profilePicInput, profileImgDisplay});
+      }
 
       // Update the small profile image in the sidebar when the user picks a picture on entry
       function updateSidebarProfileImage() {
@@ -1023,14 +1086,21 @@
 
         const initial = username.charAt(0).toUpperCase();
         const colors = [
-          '#667eea',
-          '#764ba2',
-          '#f093fb',
-          '#4facfe',
-          '#00f2fe',
+          '#4a90e2',
+          '#5b7fc9',
+          '#6ba3e8',
+          '#3a7bc0',
+          '#4f8cd9',
         ];
         const colorIndex = username.charCodeAt(0) % colors.length;
         const bgColor = colors[colorIndex];
+
+        // Get profile image from usersMap
+        const profileImage = usersMap[username];
+        const avatarContent = profileImage 
+          ? `<img src="${profileImage}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+          : initial;
+        const avatarStyle = profileImage ? '' : `style="background: ${bgColor};"`;
 
         // Display name: use "You" for local user's messages
         const displayName = isMe ? 'You' : escapeHtml(username);
@@ -1045,12 +1115,12 @@
               </div>
               <div class="message-text">${escapeHtml(message)}</div>
             </div>
-            <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
+            <div class="message-avatar" ${avatarStyle}>${avatarContent}</div>
           `;
         } else {
           // For others: avatar first, content after
           messageEl.innerHTML = `
-            <div class="message-avatar" style="background: ${bgColor};">${initial}</div>
+            <div class="message-avatar" ${avatarStyle}>${avatarContent}</div>
             <div class="message-content">
               <div class="message-header">
                 <span class="message-username">${displayName}</span>
@@ -1086,11 +1156,11 @@
 
         const initial = username.charAt(0).toUpperCase();
         const colors = [
-          '#667eea',
-          '#764ba2',
-          '#f093fb',
-          '#4facfe',
-          '#00f2fe',
+          '#4a90e2',
+          '#5b7fc9',
+          '#6ba3e8',
+          '#3a7bc0',
+          '#4f8cd9',
         ];
         const colorIndex = username.charCodeAt(0) % colors.length;
         const bgColor = colors[colorIndex];
@@ -1151,11 +1221,11 @@
             
             const initial = user.charAt(0).toUpperCase();
             const colors = [
-              '#667eea',
-              '#764ba2',
-              '#f093fb',
-              '#4facfe',
-              '#00f2fe',
+              '#4a90e2',
+              '#5b7fc9',
+              '#6ba3e8',
+              '#3a7bc0',
+              '#4f8cd9',
             ];
             const colorIndex = user.charCodeAt(0) % colors.length;
             const bgColor = colors[colorIndex];
@@ -1210,7 +1280,20 @@
         messageInput.value = '';
         sendBtn.disabled = true;
         inputArea.style.display = 'none';
-        // profile name/status removed from sidebar
+        // Reset sidebar profile picture and name
+        const sidebarAvatar = document.getElementById('sidebar-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        if (sidebarAvatar) {
+          sidebarAvatar.innerHTML = '<i class="fas fa-camera"></i>';
+          sidebarAvatar.style.background = '';
+          sidebarAvatar.style.color = '';
+          sidebarAvatar.style.fontSize = '';
+          sidebarAvatar.style.fontWeight = '';
+        }
+        if (sidebarUsername) {
+          sidebarUsername.textContent = '';
+          sidebarUsername.style.display = 'none';
+        }
         messagesDiv.innerHTML = '<div class="empty-state"><p>Connect to start chatting</p></div>';
       }
     </script>
