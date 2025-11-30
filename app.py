@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import datetime
 import uuid
+from agent_setup import run_query  
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
@@ -90,6 +91,8 @@ def on_send_message(data):
     # Store message
     room_data['messages'].append(message_data)
     
+    result = run_query(message)
+    print("TOOL OUTPUT:", result)
     # Broadcast to all users
     emit('new_message', message_data, room=CHAT_ROOM)
 

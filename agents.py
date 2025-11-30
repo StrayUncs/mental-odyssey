@@ -16,7 +16,7 @@ if not os.environ.get("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 
-model = init_chat_model("gpt-5")
+model = init_chat_model("gpt-4o-mini")  # Changed from gpt-5 (doesn't exist) to gpt-4o-mini
 
 # Greeting agent 
 GREETING_AGENT_PROMPT = (
