@@ -17,6 +17,13 @@ speaking_queue = []  # Queue of users who raised hands, in order
 current_speaker = None  # The user currently speaking
 users = {}
 
+def get_session_id_by_username(username):
+    """Return the session_id for a given username or None if not found."""
+    for sid, info in users.items():
+        if info.get('name') == username:
+            return info.get('session_id')
+    return None
+
 @app.route("/")
 def index():
     return render_template("room.html")
@@ -26,8 +33,15 @@ def handle_connect():
     session_id = str(uuid.uuid4())
     users[request.sid] = {'name': None, 'session_id': session_id}
     emit('connection_response', {'data': 'Connected to server'})
-    # Broadcast updated user list to all clients
-    users_data = [{'name': user, 'image': users_profiles.get(user)} for user in room_data['users']]
+    # Broadcast updated user list to all clients (include per-user id)
+    users_data = [
+        {
+            'id': get_session_id_by_username(user),
+            'name': user,
+            'image': users_profiles.get(user)
+        }
+        for user in room_data['users']
+    ]
     emit('users_update', {'users': users_data}, broadcast=True)
 
 @socketio.on('join_room')
@@ -51,7 +65,15 @@ def on_join(data):
         room_data['users'].append(username)
 
     # Broadcast updated user list to all clients with profile images
-    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+    users_data = [
+        {
+            'id': get_session_id_by_username(user),
+            'name': user,
+            'image': users_profiles.get(user),
+            'hand_raised': user in hand_raised
+        }
+        for user in room_data['users']
+    ]
     emit('users_update', {'users': users_data}, broadcast=True)
     
     # Notify everyone in the room
@@ -136,7 +158,15 @@ def on_leave_room():
                 speaking_queue.remove(username)
             
             # Broadcast updated user list to all clients
-            users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+            users_data = [
+                {
+                    'id': get_session_id_by_username(user),
+                    'name': user,
+                    'image': users_profiles.get(user),
+                    'hand_raised': user in hand_raised
+                }
+                for user in room_data['users']
+            ]
             emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
@@ -173,7 +203,15 @@ def handle_disconnect():
                 speaking_queue.remove(username)
             
             # Broadcast updated user list to all clients
-            users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+            users_data = [
+                {
+                    'id': get_session_id_by_username(user),
+                    'name': user,
+                    'image': users_profiles.get(user),
+                    'hand_raised': user in hand_raised
+                }
+                for user in room_data['users']
+            ]
             emit('users_update', {'users': users_data}, broadcast=True)
             
             # Notify others
@@ -201,8 +239,16 @@ def on_raise_hand():
         hand_raised[username] = datetime.now()
         speaking_queue.append(username)
     
-    # Broadcast updated user list with hand raised status
-    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+    # Broadcast updated user list with hand raised status (include id)
+    users_data = [
+        {
+            'id': get_session_id_by_username(user),
+            'name': user,
+            'image': users_profiles.get(user),
+            'hand_raised': user in hand_raised
+        }
+        for user in room_data['users']
+    ]
     emit('users_update', {'users': users_data}, broadcast=True)
     emit('hand_raised', {'username': username}, room=CHAT_ROOM)
     # Notify all clients about the current speaker (first in queue)
@@ -225,8 +271,16 @@ def on_lower_hand():
     if username in speaking_queue:
         speaking_queue.remove(username)
     
-    # Broadcast updated user list with hand raised status
-    users_data = [{'name': user, 'image': users_profiles.get(user), 'hand_raised': user in hand_raised} for user in room_data['users']]
+    # Broadcast updated user list with hand raised status (include id)
+    users_data = [
+        {
+            'id': get_session_id_by_username(user),
+            'name': user,
+            'image': users_profiles.get(user),
+            'hand_raised': user in hand_raised
+        }
+        for user in room_data['users']
+    ]
     emit('users_update', {'users': users_data}, broadcast=True)
     emit('hand_lowered', {'username': username}, room=CHAT_ROOM)
     # Notify all clients about the current speaker (first in queue)

@@ -1056,10 +1056,11 @@
             const y = Math.sin(angle) * radius;
 
             const user = typeof userObj === 'string' ? userObj : userObj.name;
+            const userId = typeof userObj === 'string' ? null : userObj.id;
             const profileImage = typeof userObj === 'string' ? null : userObj.image;
             const handRaisedStatus = typeof userObj === 'string' ? false : userObj.hand_raised;
 
-            console.log(`User ${user}: has profile image = ${profileImage ? 'Yes' : 'No'}, hand raised = ${handRaisedStatus}`);
+            console.log(`User ${user} (id=${userId}): has profile image = ${profileImage ? 'Yes' : 'No'}, hand raised = ${handRaisedStatus}`);
             
             const initial = user.charAt(0).toUpperCase();
             const colors = [
@@ -1079,8 +1080,8 @@
             const handRaisedClass = handRaisedStatus ? 'hand-raised' : '';
 
             return `
-              <div class="member-card" style="transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px)); left: 50%; top: 50%;">
-                <div class="member-avatar ${handRaisedClass}" style="background: ${profileImage ? 'transparent' : bgColor};">${avatarContent}</div>
+              <div class="member-card" data-user-id="${userId || ''}" style="transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px)); left: 50%; top: 50%;">
+                <div class="member-avatar ${handRaisedClass}" data-user-id="${userId || ''}" style="background: ${profileImage ? 'transparent' : bgColor};">${avatarContent}</div>
                 <div class="member-name">${escapeHtml(user)}</div>
               </div>
             `;
