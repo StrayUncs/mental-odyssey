@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from datetime import datetime
+from agent_setup import run_query
 import uuid
 
 app = Flask(__name__)
@@ -92,6 +93,17 @@ def on_send_message(data):
     
     # Broadcast to all users
     emit('new_message', message_data, room=CHAT_ROOM)
+
+    # Send message to superviser agent
+    result = run_query(message)
+
+    result_data = {
+        'username': "therapist",
+        'message': result,
+        'timestamp': timestamp
+    }
+    
+    emit('new_message', result_data, room=CHAT_ROOM)
 
 
 @socketio.on('leave_room')
