@@ -134,7 +134,7 @@ def on_send_message(data):
     
     # Hide typing indicator and send response
     result_data = {
-        'username': 'Therapist',
+        'username': specialist_name or 'Therapist',
         'message': result,
         'timestamp': datetime.now().strftime('%H:%M:%S')
     }

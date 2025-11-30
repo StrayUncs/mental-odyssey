@@ -895,8 +895,9 @@
       });
 
       socket.on('therapist_typing', (data) => {
-        const status = data.specialist ? `consulting ${data.specialist}` : (data.status === 'analyzing' ? 'understanding your message' : 'thinking');
-        showTypingIndicator(data.username || 'Therapist', status);
+        const displayName = data.specialist || data.username || 'Therapist';
+        const status = data.specialist ? 'thinking' : (data.status === 'analyzing' ? 'understanding your message' : 'thinking');
+        showTypingIndicator(displayName, status);
       });
 
       socket.on('therapist_stopped_typing', (data) => {
