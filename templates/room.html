@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -36,16 +37,16 @@
 
       /* Left Panel - Profile & Controls */
       .left-panel {
-        width: 250px;
+        width: 80px; /* collapsed sidebar width */
         background: #d66cc4;
         border-right: 2px solid #e0e0e0;
         display: flex;
         flex-direction: column;
-        padding: 30px 20px;
+        padding: 12px 8px;
         align-items: center;
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .profile-section {
@@ -54,8 +55,8 @@
       }
 
       .profile-img {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         margin: 0 auto 15px;
@@ -63,7 +64,7 @@
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 45px;
+        font-size: 28px;
         object-fit: cover;
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         cursor: pointer;
@@ -71,6 +72,37 @@
         position: relative;
         overflow: hidden;
       }
+
+      /* Entry overlay styles */
+      #entry-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+      }
+
+      .entry-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        width: 360px;
+        max-width: calc(100% - 32px);
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      }
+
+      .entry-card h2 { margin-bottom: 12px; }
+
+      .entry-profile-pic { width: 84px; height: 84px; margin: 0 auto 12px; position: relative; }
+      .entry-profile-pic input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+      .entry-profile-pic .profile-img-display { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; }
+
+      #entry-username { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; }
+      #entry-members-list { font-size: 13px; color: #666; min-height: 32px; margin-bottom: 6px; }
+      #entry-join-btn { padding: 10px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
 
       .profile-img:hover {
         transform: scale(1.05);
@@ -94,38 +126,37 @@
         pointer-events: none;
       }
 
-      .profile-name {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 5px;
-      }
-
-      .profile-status {
-        font-size: 12px;
-        color: #999;
+      /* Hide full profile name/status in compact sidebar; show on hover if needed */
+      .profile-name, .profile-status {
+        display: none;
       }
 
       .controls-section {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        align-items: center;
       }
 
-      /* Raise/lower hand buttons */
-      #raise-hand-btn, #lower-hand-btn {
-        display: none;
-        padding: 10px 12px;
+      /* Icon-style raise/lower/leave buttons for compact sidebar */
+      #raise-hand-btn, #lower-hand-btn, #leave-btn {
+        display: none; /* toggled in JS when connected */
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         border: none;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
         transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, background 0.12s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-        align-self: stretch;
-        text-align: center;
+      }
+
+      /* Icon styles */
+      #raise-hand-btn i, #lower-hand-btn i, #leave-btn i {
+        pointer-events: none;
       }
 
       /* Primary raise hand (gold/yellow) */
@@ -175,19 +206,15 @@
         cursor: not-allowed;
       }
 
-      #connect-btn,
-      #leave-btn {
-        padding: 12px;
+      #connect-btn {
+        padding: 10px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
         transition: all 0.3s;
         width: 100%;
-      }
-
-      #connect-btn {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
       }
@@ -202,10 +229,15 @@
         cursor: not-allowed;
       }
 
+      /* Icon leave button style */
       #leave-btn {
         background: #dc3545;
         color: white;
         display: none;
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       #leave-btn:hover {
@@ -219,14 +251,14 @@
         position: absolute;
         bottom: 0;
         left: 0;
-        width: 250px;
-        height: 280px;
+        width: 80px; /* match collapsed sidebar */
+        height: 260px;
         background: white;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        padding: 10px;
+        padding: 6px;
         border-top: 2px solid #e0e0e0;
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden;
@@ -265,12 +297,12 @@
 
       .members-circle-container {
         position: relative;
-        width: 230px;
-        height: 230px;
+        width: 70px;
+        height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 0;
+        margin-top: 4px;
       }
 
       .members-circle {
@@ -284,13 +316,13 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 6px;
         animation: slideIn 0.3s ease;
       }
 
       .member-avatar {
-        width: 70px;
-        height: 70px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         border: 4px solid #667eea;
         object-fit: cover;
@@ -300,7 +332,7 @@
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 32px;
+        font-size: 18px;
         font-weight: 600;
         overflow: hidden;
       }
@@ -318,11 +350,12 @@
       }
 
       .member-name {
-        font-size: 14px;
+        font-size: 11px;
         font-weight: 600;
         color: #333;
         text-align: center;
         white-space: nowrap;
+        display: none; /* hide names in compact sidebar */
       }
 
       .center-user {
@@ -355,6 +388,33 @@
         flex-direction: column;
         box-shadow: none;
         margin-right: 0;
+      }
+
+      /* Background members layer inside chat (faded, non-interactive) */
+      .members-bg {
+        position: absolute;
+        inset: 0 auto 0 80px; /* leave space for sidebar */
+        pointer-events: none;
+        z-index: 1; /* behind chat messages (chat messages z-index default) */
+        display: block;
+        overflow: hidden;
+        opacity: 0.08;
+      }
+
+      .members-bg .bg-avatar {
+        position: absolute;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        background: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        transform: translate(-50%, -50%);
       }
 
       .chat-header {
@@ -656,45 +716,47 @@
   </head>
   <body>
     <div class="app-container">
-      <!-- Left Panel -->
-      <div class="left-panel">
-        <div class="profile-section">
-          <div class="profile-img" id="profile-img-container">
+
+      <!-- Entry overlay: ask name, profile pic, show who's in the room -->
+      <div id="entry-overlay">
+        <div class="entry-card">
+          <h2>Join Room</h2>
+          <div class="entry-profile-pic">
             <input type="file" id="profile-pic-input" accept="image/*" />
             <div class="profile-img-display">
               <i class="fas fa-camera"></i>
             </div>
           </div>
-          <div class="profile-name" id="profile-name" style="display: none;"></div>
-          <div class="profile-status" id="profile-status" style="display: none;"></div>
-        </div>
-
-        <div class="controls-section">
-          <input
-            type="text"
-            id="username"
-            placeholder="Enter your name"
-            autocomplete="off"
-          />
-          <button id="connect-btn">Connect</button>
-          <button id="raise-hand-btn" style="display: none; background: #FFD700; color: #333;">Raise Hand</button>
-          <button id="lower-hand-btn" style="display: none; background: #999; color: white;">Lower Hand</button>
-          <button id="leave-btn">Leave</button>
-        </div>
-      </div>
-
-          <!-- Middle Panel -->
-      <div class="middle-panel">
-        <div class="members-header">Room Members</div>
-        <div class="members-circle-container">
-          <div class="members-circle" id="members-circle">
-            <div class="center-user" id="center-user"></div>
+          <input type="text" id="entry-username" placeholder="Enter your name" autocomplete="off" />
+          <div id="entry-members-list" class="entry-members-list">No one else is here</div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button id="entry-join-btn">Join</button>
           </div>
         </div>
       </div>
+      <!-- Left Panel -->
+      <div class="left-panel">
+        <div class="profile-section">
+          <div class="profile-img" id="profile-img-container">
+            <div class="profile-img-display">
+              <i class="fas fa-camera"></i>
+            </div>
+          </div>
+          <!-- compact sidebar: name/status removed (shown in overlay only) -->
+        </div>
+
+        <div class="controls-section">
+          <button id="raise-hand-btn" title="Raise hand" style="display:none;"><i class="fas fa-hand-paper"></i></button>
+          <button id="lower-hand-btn" title="Lower hand" style="display:none;"><i class="fas fa-hand-back-fist"></i></button>
+          <button id="leave-btn" title="Leave" style="display:none;"><i class="fas fa-right-from-bracket"></i></button>
+        </div>
+      </div>
+
+      <!-- Middle Panel removed: members list moved to entry overlay -->
 
       <!-- Right Panel -->
       <div class="right-panel">
+        <div id="members-bg" class="members-bg"></div>
         <div class="chat-header">
           <h2>Group Chat</h2>
         </div>
@@ -727,8 +789,11 @@
       let currentSpeaker = null;
 
       // DOM Elements
-      const usernameInput = document.getElementById('username');
-      const connectBtn = document.getElementById('connect-btn');
+      // Entry overlay elements
+      const entryOverlay = document.getElementById('entry-overlay');
+      const entryUsernameInput = document.getElementById('entry-username');
+      const entryJoinBtn = document.getElementById('entry-join-btn');
+      const entryMembersList = document.getElementById('entry-members-list');
       const leaveBtn = document.getElementById('leave-btn');
       const messagesDiv = document.getElementById('messages');
       const messageInput = document.getElementById('message-input');
@@ -736,13 +801,15 @@
       const inputArea = document.getElementById('input-area');
       const membersCircle = document.getElementById('members-circle');
       const centerUser = document.getElementById('center-user');
-      const profileName = document.getElementById('profile-name');
-      const profileStatus = document.getElementById('profile-status');
+      // profile name/status removed from sidebar; overlay manages join info
       const profilePicInput = document.getElementById('profile-pic-input');
       const profileImgDisplay = document.querySelector('.profile-img-display');
       const raiseHandBtn = document.getElementById('raise-hand-btn');
       const lowerHandBtn = document.getElementById('lower-hand-btn');
       let userProfileImage = null;
+
+      // show the overlay on load
+      entryOverlay.style.display = 'flex';
       // Socket Events
       socket.on('connection_response', (data) => {
         console.log('Connected:', data.data);
@@ -750,6 +817,20 @@
 
       socket.on('users_update', (data) => {
         updateMembersList(data.users);
+        // update entry overlay members list if visible
+        if (entryOverlay && entryOverlay.style.display !== 'none') {
+          const otherUsers = data.users.filter(u => (typeof u === 'string' ? u : u.name) !== currentUsername);
+          if (otherUsers.length === 0) {
+            entryMembersList.textContent = 'No one else is here';
+          } else {
+            const lines = otherUsers.map(u => {
+              const name = (typeof u === 'string' ? u : u.name);
+              return `${escapeHtml(name)} is here`;
+            });
+            entryMembersList.innerHTML = lines.join('<br>');
+          }
+        }
+        // render members as a faded background in the chat area
       });
 
       socket.on('user_joined', (data) => {
@@ -816,15 +897,13 @@
       });
 
       // UI Event Handlers
-      connectBtn.addEventListener('click', () => {
-        let username = usernameInput.value.trim();
-
+      // Entry overlay join handling
+      entryJoinBtn.addEventListener('click', () => {
+        let username = entryUsernameInput.value.trim();
         if (!username) {
           alert('Please enter a username');
           return;
         }
-
-        // Capitalize first letter
         username = username.charAt(0).toUpperCase() + username.slice(1);
         currentUsername = username;
         isConnected = true;
@@ -832,25 +911,20 @@
         console.log('Joining with profile image:', userProfileImage ? 'Yes' : 'No');
         socket.emit('join_room', { username, profile_image: userProfileImage });
 
-        // Update UI
-        usernameInput.disabled = true;
-        connectBtn.style.display = 'none';
+        // Update UI: hide overlay and show sidebar controls
+        entryOverlay.style.display = 'none';
         leaveBtn.style.display = 'block';
         raiseHandBtn.style.display = 'block';
+        // show input area
+        inputArea.style.display = 'flex';
         messageInput.disabled = true;
         sendBtn.disabled = true;
-        inputArea.style.display = 'flex';
-        profileName.textContent = username;
-        profileStatus.textContent = 'Online';
-        profileName.style.display = 'block';
-        profileStatus.style.display = 'block';
+        // sidebar is compact; profile display is handled via avatar image only
         messageInput.focus();
       });
 
-      usernameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          connectBtn.click();
-        }
+      entryUsernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') entryJoinBtn.click();
       });
 
       leaveBtn.addEventListener('click', () => {
@@ -915,6 +989,14 @@
           reader.readAsDataURL(file);
         }
       });
+
+      // Update the small profile image in the sidebar when the user picks a picture on entry
+      function updateSidebarProfileImage() {
+        const imgEl = document.querySelector('#profile-img-container .profile-img-display');
+        if (userProfileImage) {
+          imgEl.innerHTML = `<img src="${userProfileImage}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        }
+      }
 
       sendBtn.addEventListener('click', sendMessage);
       messageInput.addEventListener('keypress', (e) => {
@@ -1036,9 +1118,13 @@
       }
 
       function updateMembersList(users) {
+        // If members UI has been removed from DOM, skip updating
+        if (!membersCircle) return;
         if (users.length === 0) {
-          membersCircle.innerHTML = '<div class="empty-members">Join to see members</div>';
-          centerUser.style.display = 'none';
+          if (membersCircle) {
+            membersCircle.innerHTML = '<div class="empty-members">Join to see members</div>';
+            centerUser.style.display = 'none';
+          }
           return;
         }
 
@@ -1113,10 +1199,8 @@
         isConnected = false;
         currentUsername = '';
         handRaised = false;
-
-        usernameInput.disabled = false;
-        usernameInput.value = '';
-        connectBtn.style.display = 'block';
+        // entry overlay will allow re-joining
+        if (entryOverlay) entryOverlay.style.display = 'flex';
         leaveBtn.style.display = 'none';
         raiseHandBtn.style.display = 'none';
         lowerHandBtn.style.display = 'none';
@@ -1124,8 +1208,7 @@
         messageInput.value = '';
         sendBtn.disabled = true;
         inputArea.style.display = 'none';
-        profileName.style.display = 'none';
-        profileStatus.style.display = 'none';
+        // profile name/status removed from sidebar
         messagesDiv.innerHTML = '<div class="empty-state"><p>Connect to start chatting</p></div>';
       }
     </script>
